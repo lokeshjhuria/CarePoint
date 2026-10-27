@@ -3,62 +3,544 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f5f8fc">
-  <title>CarePoint | Hospital Appointment Management System</title>
+  <meta name="theme-color" content="#1a365d">
+  <title>CarePoint Health | Hospital Appointment Management System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
 <body>
 
-  <!-- ================= AUTH SCREEN (LOGIN & CREATE ACCOUNT) ================= -->
-  <div class="auth-wrapper" id="auth-screen">
-    <div class="auth-card">
-      <div class="auth-header">
+  <!-- ================= EMERGENCY NOTIFICATION BAR ================= -->
+  <div class="emergency-bar">
+    <div class="emergency-inner">
+      <span class="emergency-text">
+        <span class="emergency-pulse"></span>
+        <strong>24/7 Medical Emergency:</strong> Call hospital desk at <a href="tel:+919579975307">+91 95799 75307</a> or emergency ambulance at <strong>112</strong>
+      </span>
+      <div class="emergency-right">
+        <span>📍 Main Campus, CarePoint Boulevard</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN UNIFIED NAVBAR ================= -->
+  <header class="navbar">
+    <div class="navbar-container">
+      <a class="brand" href="#home" id="nav-brand" aria-label="CarePoint Home">
+        <span class="brand-mark"><span></span><span></span></span>
+        <span class="brand-text">care<span class="brand-light">point</span><small>HEALTHCARE, MADE HUMAN</small></span>
+      </a>
+
+      <nav class="nav-links" id="main-nav">
+        <a href="#home" class="nav-item active" id="btn-nav-home">Home</a>
+        <a href="#specialists" class="nav-item" id="btn-nav-doctors">Our Doctors</a>
+        <a href="#facilities" class="nav-item" id="btn-nav-facilities">Why CarePoint</a>
+        <a href="#dashboard" class="nav-item" id="btn-nav-dashboard">
+          <span class="nav-dash-icon">▦</span> <span id="nav-dash-text">Appointments Dashboard</span>
+        </a>
+      </nav>
+
+      <div class="navbar-actions">
+        <!-- Live Excel Download Pill -->
+        <a href="/api/appointments/export-excel" id="nav-excel-download" class="excel-pill-btn" download="carepoint_appointments.xlsx" title="Download Live Excel Spreadsheet">
+          <span class="excel-icon">📊</span>
+          <span>Excel Sheet (.xlsx)</span>
+        </a>
+
+        <!-- User State Pill (When Logged In) -->
+        <div class="user-pill" id="nav-user-pill" style="display: none;">
+          <span class="user-avatar-small" id="nav-avatar">US</span>
+          <div class="user-pill-info">
+            <strong id="nav-user-name">User</strong>
+            <span class="badge-role" id="nav-user-role">Patient</span>
+          </div>
+          <button type="button" class="btn-logout" id="nav-logout-btn" title="Sign Out">Sign Out</button>
+        </div>
+
+        <!-- Auth Buttons (When Logged Out) -->
+        <div class="auth-buttons-group" id="nav-auth-buttons">
+          <button type="button" class="btn-text" id="open-login-btn">Sign In</button>
+          <button type="button" class="btn-primary" id="open-register-btn">Book Appointment <span>→</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- ================= VIEW 1: PUBLIC HOSPITAL WEBSITE ================= -->
+  <main id="view-home">
+    
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="home">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Modern Healthcare • Real-Time Appointment Scheduling
+          </div>
+          <h1>Thoughtful care that feels a little more <em>human.</em></h1>
+          <p class="hero-description">
+            Find the right specialist, choose a convenient appointment time, and receive personalized medical care. All appointment records are automatically stored in the hospital's verified Excel database.
+          </p>
+
+          <!-- Search Bar -->
+          <form class="hero-search-box" id="hero-doctor-search">
+            <span class="search-symbol">⌕</span>
+            <input type="text" id="hero-search-input" placeholder="Search by doctor name or specialty (e.g. Cardiology, Dr. Sharma)..." aria-label="Search doctors">
+            <button type="submit" class="hero-search-btn">Find Doctor <span>→</span></button>
+          </form>
+
+          <!-- Popular Specialty Quick Chips -->
+          <div class="popular-tags">
+            <span class="tags-label">Quick Specialties:</span>
+            <button type="button" class="tag-chip" data-specialty="Cardiology">Cardiology</button>
+            <button type="button" class="tag-chip" data-specialty="Dermatology">Dermatology</button>
+            <button type="button" class="tag-chip" data-specialty="Pediatrics">Pediatrics</button>
+            <button type="button" class="tag-chip" data-specialty="Neurology">Neurology</button>
+            <button type="button" class="tag-chip" data-specialty="Orthopedics">Orthopedics</button>
+          </div>
+
+          <!-- Trust Badges -->
+          <div class="hero-stats">
+            <div class="hero-stat-item">
+              <strong>20,000+</strong>
+              <small>Patients Treated</small>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="hero-stat-item">
+              <strong>20 Specialists</strong>
+              <small>Across 20 Departments</small>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="hero-stat-item">
+              <strong>4.9 ★★★★★</strong>
+              <small>Patient Satisfaction</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="visual-card-wrap">
+            <img class="hero-img" src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=85" alt="CarePoint Doctor">
+            <div class="floating-badge badge-top">
+              <span class="badge-icon">✓</span>
+              <div>
+                <strong>Instant Booking</strong>
+                <small>No waiting queues</small>
+              </div>
+            </div>
+            <div class="floating-badge badge-bottom">
+              <span class="badge-icon green">📊</span>
+              <div>
+                <strong>Excel Storage Live</strong>
+                <small>data/appointments.xlsx</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HIGHLIGHT STRIP -->
+    <section class="hospital-strip">
+      <div class="strip-container">
+        <div class="strip-col">
+          <span class="strip-num">20+</span>
+          <div><strong>Clinical Specialties</strong><small>Complete healthcare solutions</small></div>
+        </div>
+        <div class="strip-col">
+          <span class="strip-num">100%</span>
+          <div><strong>Verified Doctors</strong><small>Experienced senior consultants</small></div>
+        </div>
+        <div class="strip-col">
+          <span class="strip-num">Live</span>
+          <div><strong>Excel Spreadsheet</strong><small>Real-time booking data export</small></div>
+        </div>
+        <div class="strip-col">
+          <span class="strip-num">24/7</span>
+          <div><strong>Hospital Support</strong><small>Always ready to assist you</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEET YOUR DOCTORS / SPECIALISTS SECTION -->
+    <section class="section-container" id="specialists">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-eyebrow">OUR SPECIALISTS</span>
+          <h2>Meet our verified doctors & specialists</h2>
+          <p>Book consultations with experienced medical professionals across 20 care departments.</p>
+        </div>
+        <button type="button" class="btn-primary" id="btn-hero-book">Book Visit <span>↗</span></button>
+      </div>
+
+      <!-- Department Filter Chips -->
+      <div class="department-filter-bar" id="department-chips">
+        <button class="dept-chip active" data-dept="All">All Specialties (20)</button>
+        <!-- Populated dynamically by app.js -->
+      </div>
+
+      <!-- Doctor Cards Grid -->
+      <div class="doctor-cards-grid" id="doctor-cards-container">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- WHY CHOOSE CAREPOINT -->
+    <section class="section-container bg-subtle" id="facilities">
+      <div class="section-header text-center">
+        <span class="section-eyebrow">CAREPOINT ADVANTAGE</span>
+        <h2>Healthcare that prioritizes your comfort</h2>
+        <p>A better patient experience built on speed, transparent communication, and expert care.</p>
+      </div>
+
+      <div class="features-grid">
+        <article class="feature-card">
+          <div class="feature-icon blue">▦</div>
+          <h3>Easy Online Scheduling</h3>
+          <p>Choose your specialty, select your doctor, and lock in your appointment time in under a minute without phone calls.</p>
+        </article>
+        <article class="feature-card green">
+          <div class="feature-icon green">📊</div>
+          <h3>Automated Excel Registry</h3>
+          <p>All appointments are saved directly to an Excel spreadsheet (<code>.xlsx</code>) and CSV format, enabling seamless hospital record management.</p>
+        </article>
+        <article class="feature-card purple">
+          <div class="feature-icon purple">🧑‍⚕️</div>
+          <h3>Dual Role Portals</h3>
+          <p>Dedicated interfaces for Patients to manage their personal visits, and for Hospital Staff to oversee OPD operations and update visit statuses.</p>
+        </article>
+        <article class="feature-card orange">
+          <div class="feature-icon orange">🛡️</div>
+          <h3>Secure & Reliable</h3>
+          <p>Local and cloud deployment support with persistent storage, session tokens, and instant health checks.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="section-container">
+      <div class="section-header">
+        <span class="section-eyebrow">PATIENT TESTIMONIALS</span>
+        <h2>Trusted by thousands of families</h2>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>“Booking an appointment with Dr. Sharma was effortless. I got instant confirmation and didn’t have to wait in any long lines at the hospital.”</p>
+          <div class="testi-author">
+            <strong>Pooja Sharma</strong>
+            <small>Cardiology Patient • Delhi</small>
+          </div>
+        </div>
+        <div class="testimonial-card highlight">
+          <div class="stars">★★★★★</div>
+          <p>“The staff portal is extremely well designed. As an administrator, seeing all appointments synchronized into an Excel sheet in real time saves our team hours of manual work.”</p>
+          <div class="testi-author">
+            <strong>Omkar Fandade</strong>
+            <small>Hospital Administrator</small>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>“Finding a top pediatrician for my son was so quick. The clinic is clean, caring, and our doctor took the time to answer every question.”</p>
+          <div class="testi-author">
+            <strong>Karan Malhotra</strong>
+            <small>Pediatrics Patient</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ================= VIEW 2: APPOINTMENTS DASHBOARD (NO EMPTY LEFT SPACE) ================= -->
+  <main id="view-dashboard" class="dashboard-view" style="display: none;">
+    <div class="dashboard-full-container">
+
+      <!-- DASHBOARD TOP HEADER & EXCEL STRIP -->
+      <div class="dashboard-header-row">
+        <div>
+          <div class="dash-role-banner" id="dash-role-banner">
+            <span class="role-pill-indicator" id="dash-role-pill">STAFF DASHBOARD</span>
+            <span class="portal-subtext" id="dash-portal-subtext">Hospital Management Console</span>
+          </div>
+          <h1 id="dash-greeting">Good day, Administrator <span class="wave">✦</span></h1>
+          <p class="dash-subtitle" id="dash-subtitle">Here is your live appointment schedule and patient management overview.</p>
+        </div>
+
+        <div class="dash-header-actions">
+          <button type="button" class="btn-outline" id="btn-back-to-home">← Back to Website</button>
+          <a href="/api/appointments/export-excel" class="btn-excel" download="carepoint_appointments.xlsx" id="dash-btn-excel" title="Download Excel Workbook">
+            <span>📊</span> Download Excel (.xlsx)
+          </a>
+          <a href="/api/appointments/export-csv" class="btn-csv" download="carepoint_appointments.csv" id="dash-btn-csv" title="Download CSV File">
+            CSV
+          </a>
+        </div>
+      </div>
+
+      <!-- EXCEL PERSISTENCE STATUS BANNER -->
+      <div class="excel-live-banner">
+        <div class="excel-banner-left">
+          <div class="excel-badge-square">📊</div>
+          <div>
+            <strong>Excel Spreadsheet Storage Active</strong>
+            <p>Every booking, update, or cancellation is automatically recorded in <code>data/appointments.xlsx</code>.</p>
+          </div>
+        </div>
+        <div class="excel-banner-right">
+          <span class="live-indicator"><span class="live-dot"></span> Live File Sync</span>
+        </div>
+      </div>
+
+      <!-- METRIC STATS GRID -->
+      <section class="stats-row" aria-label="Appointment statistics">
+        <article class="dash-stat-card">
+          <div class="stat-header">
+            <span id="label-stat-total">Total Appointments</span>
+            <span class="stat-icon-wrap blue">▤</span>
+          </div>
+          <strong id="stat-total">0</strong>
+          <small id="sub-stat-total">All recorded appointments</small>
+        </article>
+
+        <article class="dash-stat-card">
+          <div class="stat-header">
+            <span>Scheduled</span>
+            <span class="stat-icon-wrap violet">◷</span>
+          </div>
+          <strong id="stat-scheduled">0</strong>
+          <small>Awaiting patient visit</small>
+        </article>
+
+        <article class="dash-stat-card">
+          <div class="stat-header">
+            <span>Completed</span>
+            <span class="stat-icon-wrap green">✓</span>
+          </div>
+          <strong id="stat-completed">0</strong>
+          <small>Successfully attended</small>
+        </article>
+
+        <article class="dash-stat-card">
+          <div class="stat-header">
+            <span>Today's Visits</span>
+            <span class="stat-icon-wrap orange">♧</span>
+          </div>
+          <strong id="stat-today">0</strong>
+          <small>Scheduled for today</small>
+        </article>
+      </section>
+
+      <!-- TWO-COLUMN DASHBOARD CONTENT (FULL WIDTH, NO EMPTY MARGINS) -->
+      <div class="dashboard-columns-grid">
+        
+        <!-- LEFT COLUMN: APPOINTMENTS DIRECTORY TABLE -->
+        <section class="dash-panel appointments-section" id="section-appointments-table">
+          <div class="panel-top-row">
+            <div>
+              <h2 id="appointments-title">Appointments Directory</h2>
+              <p id="appointments-desc">Search, filter, and manage scheduled doctor visits.</p>
+            </div>
+            <div class="panel-top-controls">
+              <button class="btn-refresh" id="refresh-button" type="button" title="Refresh Appointments">↻ Refresh</button>
+            </div>
+          </div>
+
+          <!-- Table Controls -->
+          <div class="table-toolbar">
+            <div class="search-input-wrap">
+              <span class="search-icon-small">⌕</span>
+              <input id="search-input" type="search" placeholder="Search by patient, doctor, department, or phone..." aria-label="Search appointments">
+            </div>
+            <div class="status-filter-wrap">
+              <label for="status-filter" class="sr-only">Filter by status</label>
+              <select id="status-filter">
+                <option value="All">All Statuses</option>
+                <option value="Scheduled">Scheduled</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Appointments Table -->
+          <div class="table-responsive">
+            <table class="appointments-table">
+              <thead>
+                <tr>
+                  <th>PATIENT DETAILS</th>
+                  <th>DOCTOR &amp; SPECIALTY</th>
+                  <th>DATE &amp; TIME</th>
+                  <th>STATUS</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="appointment-rows">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state">
+              <div class="empty-icon">▤</div>
+              <strong id="empty-title">No appointments found</strong>
+              <p id="empty-desc">New scheduled appointments will appear here automatically.</p>
+              <a href="#book-form" id="empty-book-link">Book your appointment now →</a>
+            </div>
+          </div>
+
+          <!-- Table Footer -->
+          <div class="table-bottom-bar">
+            <span id="results-count">Showing 0 appointments</span>
+            <span class="sync-tag">Excel Sheet Synchronized <span class="sync-dot"></span></span>
+          </div>
+        </section>
+
+        <!-- RIGHT COLUMN: APPOINTMENT BOOKING PANEL -->
+        <section class="dash-panel booking-section" id="book-form">
+          <div class="panel-top-row">
+            <div>
+              <h2 id="booking-heading">Schedule Appointment</h2>
+              <p id="booking-subheading">Select doctor and date to schedule a visit.</p>
+            </div>
+            <div class="panel-icon-badge">＋</div>
+          </div>
+
+          <form id="appointment-form" class="appointment-form">
+            <label>
+              Patient Name <span>*</span>
+              <input name="patient" id="form-patient" type="text" maxlength="80" placeholder="e.g. Alex Morgan" required>
+            </label>
+
+            <div class="form-grid-2">
+              <label>
+                Phone Number <span>*</span>
+                <input name="phone" id="form-phone" type="tel" maxlength="20" placeholder="+91 98765 43210" required>
+              </label>
+              <label>
+                Email Address <span>*</span>
+                <input name="email" id="form-email" type="email" maxlength="120" placeholder="alex@email.com" required>
+              </label>
+            </div>
+
+            <div class="form-grid-2">
+              <label>
+                Department / Specialty <span>*</span>
+                <select name="department" id="department-select" required>
+                  <option value="">Select Department</option>
+                </select>
+              </label>
+              <label>
+                Doctor <span>*</span>
+                <select name="doctor" id="doctor-select" required>
+                  <option value="">Select Doctor</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="form-grid-2">
+              <label>
+                Appointment Date <span>*</span>
+                <input name="date" id="date-input" type="date" required>
+              </label>
+              <label>
+                Appointment Time <span>*</span>
+                <select name="time" id="time-select" required>
+                  <option value="">Select Time Slot</option>
+                  <option>09:00</option>
+                  <option>09:30</option>
+                  <option>10:00</option>
+                  <option>10:30</option>
+                  <option>11:00</option>
+                  <option>11:30</option>
+                  <option>13:00</option>
+                  <option>13:30</option>
+                  <option>14:00</option>
+                  <option>14:30</option>
+                  <option>15:00</option>
+                  <option>15:30</option>
+                  <option>16:00</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Reason for Visit / Symptoms <span>*</span>
+              <textarea name="reason" id="form-reason" rows="3" maxlength="300" placeholder="Briefly describe health symptoms or purpose of consultation..." required></textarea>
+            </label>
+
+            <div class="form-feedback" id="form-message" role="status" aria-live="polite"></div>
+
+            <button type="submit" class="btn-submit" id="submit-appointment-btn">
+              Schedule Appointment <span>→</span>
+            </button>
+
+            <p class="form-secure-note">
+              <span>🔒</span> Saved immediately to verified <strong>Excel Sheet (appointments.xlsx)</strong>.
+            </p>
+          </form>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+
+  <!-- ================= AUTH MODAL (LOGIN & CREATE ACCOUNT) ================= -->
+  <div class="modal-backdrop" id="auth-modal" style="display: none;">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" id="modal-close-btn" aria-label="Close dialog">×</button>
+
+      <div class="modal-header">
         <div class="brand auth-brand">
           <span class="brand-mark"><span></span><span></span></span>
-          <span>care<span class="brand-light">point</span><small>HEALTHCARE, MADE HUMAN</small></span>
+          <span class="brand-text">care<span class="brand-light">point</span></span>
         </div>
-        <h2>Welcome to CarePoint</h2>
-        <p>Hospital Appointment System with Excel Sheet Storage</p>
+        <h2 id="auth-modal-title">Welcome to CarePoint</h2>
+        <p>Sign in to manage appointments or create a new account</p>
       </div>
 
-      <!-- Auth Tabs: Sign In / Create Account -->
-      <div class="auth-tabs" role="tablist">
-        <button class="auth-tab active" id="tab-login" type="button" role="tab">Sign In</button>
-        <button class="auth-tab" id="tab-register" type="button" role="tab">Create Account</button>
+      <!-- Tabs: Sign In / Create Account -->
+      <div class="auth-tabs-row" role="tablist">
+        <button class="tab-btn active" id="tab-login" type="button" role="tab">Sign In</button>
+        <button class="tab-btn" id="tab-register" type="button" role="tab">Create Account</button>
       </div>
 
-      <!-- Quick Demo Login Bar -->
-      <div class="demo-login-box">
-        <span class="demo-label">Quick Demo Access:</span>
-        <div class="demo-buttons">
-          <button type="button" class="demo-btn staff-demo" id="demo-staff-btn">
-            <span class="demo-badge staff">STAFF</span> Omkar (Admin)
+      <!-- Quick Demo Badges -->
+      <div class="demo-login-strip">
+        <span class="demo-strip-label">Quick 1-Click Demo:</span>
+        <div class="demo-chips">
+          <button type="button" class="demo-chip-btn staff" id="demo-staff-btn">
+            <span class="chip-tag staff">STAFF</span> Omkar (Admin)
           </button>
-          <button type="button" class="demo-btn patient-demo" id="demo-patient-btn">
-            <span class="demo-badge patient">PATIENT</span> Alex Morgan
+          <button type="button" class="demo-chip-btn patient" id="demo-patient-btn">
+            <span class="chip-tag patient">PATIENT</span> Alex Morgan
           </button>
         </div>
       </div>
 
       <!-- SIGN IN FORM -->
-      <form class="auth-form" id="login-form">
-        <div class="role-selector-pill">
-          <label class="role-pill-option">
+      <form class="modal-form" id="login-form">
+        <div class="role-pill-switch">
+          <label class="pill-option">
             <input type="radio" name="loginRole" value="STAFF" id="login-role-staff">
             <span>🧑‍⚕️ Staff Sign In</span>
           </label>
-          <label class="role-pill-option">
+          <label class="pill-option">
             <input type="radio" name="loginRole" value="PATIENT" id="login-role-patient" checked>
             <span>👤 Patient Sign In</span>
           </label>
         </div>
 
         <label>
-          Email address <span>*</span>
+          Email Address <span>*</span>
           <input type="email" id="login-email" name="email" placeholder="e.g. staff@carepoint.com" required autocomplete="email">
         </label>
 
@@ -67,33 +549,33 @@
           <input type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password">
         </label>
 
-        <div class="auth-message" id="login-message" role="status" aria-live="polite"></div>
+        <div class="form-feedback" id="login-message" role="status" aria-live="polite"></div>
 
-        <button type="submit" class="submit-button auth-submit" id="login-submit-btn">
+        <button type="submit" class="btn-submit" id="login-submit-btn">
           Sign In to CarePoint <span>→</span>
         </button>
       </form>
 
       <!-- CREATE ACCOUNT FORM -->
-      <form class="auth-form" id="register-form" style="display: none;">
-        <div class="form-role-select">
-          <span class="field-title">I am registering as: <span>*</span></span>
-          <div class="role-cards-grid">
-            <label class="role-choice-card active" id="role-choice-patient">
+      <form class="modal-form" id="register-form" style="display: none;">
+        <div class="role-selection-box">
+          <span class="selection-title">Select Account Type: <span>*</span></span>
+          <div class="selection-grid">
+            <label class="selection-card active" id="role-choice-patient">
               <input type="radio" name="registerRole" value="PATIENT" checked>
-              <div class="role-choice-icon">👤</div>
-              <div class="role-choice-info">
+              <span class="selection-icon">👤</span>
+              <div>
                 <strong>Patient</strong>
-                <small>Book & manage doctor appointments</small>
+                <small>Book & track doctor visits</small>
               </div>
             </label>
 
-            <label class="role-choice-card" id="role-choice-staff">
+            <label class="selection-card" id="role-choice-staff">
               <input type="radio" name="registerRole" value="STAFF">
-              <div class="role-choice-icon">🧑‍⚕️</div>
-              <div class="role-choice-info">
-                <strong>Hospital Staff</strong>
-                <small>Manage visits, status & Excel exports</small>
+              <span class="selection-icon">🧑‍⚕️</span>
+              <div>
+                <strong>Staff Member</strong>
+                <small>Hospital OPD & Excel management</small>
               </div>
             </label>
           </div>
@@ -104,10 +586,10 @@
           <input type="text" id="reg-name" name="name" maxlength="80" placeholder="e.g. Alex Morgan" required autocomplete="name">
         </label>
 
-        <div class="form-row">
+        <div class="form-grid-2">
           <label>
             Email Address <span>*</span>
-            <input type="email" id="reg-email" name="email" maxlength="120" placeholder="you@carepoint.com" required autocomplete="email">
+            <input type="email" id="reg-email" name="email" maxlength="120" placeholder="alex@carepoint.com" required autocomplete="email">
           </label>
           <label>
             Phone Number <span>*</span>
@@ -117,7 +599,7 @@
 
         <div id="staff-fields" style="display: none;">
           <label>
-            Staff Department / Role <span>*</span>
+            Department / Designation <span>*</span>
             <select id="reg-department" name="department">
               <option value="Administration">Administration & Front Desk</option>
               <option value="Cardiology">Cardiology Department</option>
@@ -131,10 +613,10 @@
           </label>
         </div>
 
-        <div class="form-row">
+        <div class="form-grid-2">
           <label>
             Password <span>*</span>
-            <input type="password" id="reg-password" name="password" minlength="4" placeholder="At least 4 characters" required autocomplete="new-password">
+            <input type="password" id="reg-password" name="password" minlength="4" placeholder="Min 4 characters" required autocomplete="new-password">
           </label>
           <label>
             Confirm Password <span>*</span>
@@ -142,319 +624,54 @@
           </label>
         </div>
 
-        <div class="auth-message" id="register-message" role="status" aria-live="polite"></div>
+        <div class="form-feedback" id="register-message" role="status" aria-live="polite"></div>
 
-        <button type="submit" class="submit-button auth-submit" id="register-submit-btn">
+        <button type="submit" class="btn-submit" id="register-submit-btn">
           Create Account <span>→</span>
         </button>
       </form>
-
-      <div class="auth-footer-note">
-        <span>🔒</span> Appointment data is automatically synchronized and saved in <strong>Excel (.xlsx) format</strong>.
-      </div>
     </div>
   </div>
 
 
-  <!-- ================= MAIN APPLICATION DASHBOARD ================= -->
-  <div class="app-shell" id="app-shell" style="display: none;">
-    
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <a class="brand" href="#" aria-label="CarePoint home">
-        <span class="brand-mark"><span></span><span></span></span>
-        <span>care<span class="brand-light">point</span><small>HEALTHCARE, MADE HUMAN</small></span>
-      </a>
-
-      <div class="user-role-badge-sidebar" id="sidebar-role-badge">
-        <span class="role-tag" id="sidebar-role-tag">PATIENT</span>
-        <span class="portal-name" id="sidebar-portal-name">Patient Portal</span>
-      </div>
-
-      <div class="side-label">WORKSPACE</div>
-      <nav class="navigation" aria-label="Main navigation">
-        <a class="nav-link active" href="#dashboard" id="nav-dashboard"><span class="nav-icon">▦</span> Dashboard</a>
-        <a class="nav-link" href="#appointments" id="nav-appointments"><span class="nav-icon">▤</span> <span id="nav-appointments-text">Appointments</span></a>
-        <a class="nav-link" href="#book-appointment" id="nav-book"><span class="nav-icon">＋</span> Book Appointment</a>
-        <a class="nav-link excel-nav-link" href="/api/appointments/export-excel" id="nav-excel" target="_blank"><span class="nav-icon">📊</span> Export Excel (.xlsx)</a>
-      </nav>
-
-      <div class="sidebar-bottom">
-        <div class="excel-status-box">
-          <div class="excel-status-icon">📁</div>
-          <div>
-            <strong>Excel Storage Live</strong>
-            <small>Saved: data/appointments.xlsx</small>
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-brand-col">
+          <div class="brand">
+            <span class="brand-mark"><span></span><span></span></span>
+            <span class="brand-text">care<span class="brand-light">point</span></span>
           </div>
+          <p>Thoughtful healthcare, trusted medical professionals, and streamlined digital appointments with live Excel spreadsheet storage.</p>
         </div>
-
-        <div class="help-card">
-          <span class="help-icon">✳</span>
-          <strong>Front Desk Support</strong>
-          <p>CarePoint reception is always ready to assist.</p>
-          <a href="tel:+919579975307">Call +91 95799 75307 ↗</a>
+        <div class="footer-links-col">
+          <h4>Departments</h4>
+          <a href="#specialists">Cardiology</a>
+          <a href="#specialists">Pediatrics</a>
+          <a href="#specialists">Dermatology</a>
+          <a href="#specialists">Orthopedics</a>
+          <a href="#specialists">Neurology</a>
         </div>
-
-        <div class="profile">
-          <div class="avatar" id="user-avatar">US</div>
-          <div class="user-meta">
-            <strong id="user-name">Loading...</strong>
-            <small id="user-role-desc">Role</small>
-          </div>
-          <button class="sign-out-btn" id="logout-button" title="Sign Out" aria-label="Sign Out">⎋</button>
+        <div class="footer-links-col">
+          <h4>Hospital</h4>
+          <a href="#home">About CarePoint</a>
+          <a href="#facilities">Why CarePoint</a>
+          <a href="#dashboard">Live Dashboard</a>
+          <a href="/api/appointments/export-excel">Download Excel Sheet</a>
+        </div>
+        <div class="footer-links-col">
+          <h4>Contact & Desk</h4>
+          <p>Emergency: <strong>112</strong></p>
+          <p>Front Desk: <strong>+91 95799 75307</strong></p>
+          <p>Email: <a href="mailto:care@carepoint.hospital">care@carepoint.hospital</a></p>
         </div>
       </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-      <header class="topbar">
-        <div class="breadcrumb">
-          CarePoint <span>/</span> <strong id="breadcrumb-title">Dashboard</strong>
-        </div>
-
-        <div class="topbar-right">
-          <div class="excel-quick-download">
-            <a href="/api/appointments/export-excel" id="header-export-excel" class="excel-badge-btn" download="carepoint_appointments.xlsx" title="Download Excel Sheet">
-              <span class="excel-icon">📗</span> Download Excel (.xlsx)
-            </a>
-            <a href="/api/appointments/export-csv" id="header-export-csv" class="csv-badge-btn" download="carepoint_appointments.csv" title="Download CSV Sheet">
-              CSV
-            </a>
-          </div>
-          <span class="today-label" id="today-label"></span>
-          <div class="header-user-pill">
-            <span class="top-avatar" id="top-avatar">US</span>
-            <span class="top-user-name" id="top-user-name">User</span>
-            <button class="topbar-logout-btn" id="topbar-logout-btn" title="Sign Out">Sign Out</button>
-          </div>
-        </div>
-      </header>
-
-      <div class="page-content" id="dashboard">
-        
-        <!-- EXCEL NOTIFICATION STRIP -->
-        <div class="excel-banner">
-          <div class="excel-banner-left">
-            <div class="excel-logo-icon">📊</div>
-            <div>
-              <h3>Appointment Database Stored in Excel</h3>
-              <p>All bookings, cancellations, and status updates are saved in real-time to <code>data/appointments.xlsx</code>.</p>
-            </div>
-          </div>
-          <div class="excel-banner-actions">
-            <a href="/api/appointments/export-excel" class="btn-excel-primary" download="carepoint_appointments.xlsx" id="banner-download-excel">
-              <span>📥</span> Download Excel Sheet (.xlsx)
-            </a>
-            <a href="/api/appointments/export-csv" class="btn-excel-secondary" download="carepoint_appointments.csv" id="banner-download-csv">
-              Download CSV
-            </a>
-          </div>
-        </div>
-
-        <!-- WELCOME SECTION -->
-        <section class="welcome-row">
-          <div>
-            <p class="eyebrow" id="welcome-eyebrow">PORTAL OVERVIEW</p>
-            <h1>Good day, <span id="welcome-user-name">User</span> <span class="wave">✦</span></h1>
-            <p class="subtitle" id="welcome-subtitle">Here is your healthcare & appointment schedule.</p>
-          </div>
-          <a class="primary-button" href="#book-appointment"><span>＋</span> New Appointment</a>
-        </section>
-
-        <!-- STATS CARDS -->
-        <section class="stats-grid" aria-label="Appointment statistics">
-          <article class="stat-card">
-            <div class="stat-top">
-              <span id="stat-label-total">Total Appointments</span>
-              <span class="stat-icon blue">▤</span>
-            </div>
-            <strong id="stat-total">0</strong>
-            <small id="stat-sub-total">All recorded visits</small>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-top">
-              <span>Scheduled</span>
-              <span class="stat-icon violet">◷</span>
-            </div>
-            <strong id="stat-scheduled">0</strong>
-            <small>Awaiting patient visit</small>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-top">
-              <span>Completed</span>
-              <span class="stat-icon green">✓</span>
-            </div>
-            <strong id="stat-completed">0</strong>
-            <small>Successfully attended</small>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-top">
-              <span>Today's Visits</span>
-              <span class="stat-icon orange">♧</span>
-            </div>
-            <strong id="stat-today">0</strong>
-            <small>Scheduled for today</small>
-          </article>
-        </section>
-
-        <!-- APPOINTMENTS & BOOKING GRID -->
-        <section class="content-grid">
-          
-          <!-- APPOINTMENTS TABLE PANEL -->
-          <article class="panel appointments-panel" id="appointments">
-            <div class="panel-heading">
-              <div>
-                <h2 id="appointments-panel-title">Appointments</h2>
-                <p id="appointments-panel-desc">Manage and keep track of visits.</p>
-              </div>
-              <div class="panel-heading-actions">
-                <a href="/api/appointments/export-excel" class="panel-excel-link" id="panel-export-excel" title="Export this table to Excel">
-                  <span>📊</span> Excel
-                </a>
-                <button class="text-button" id="refresh-button" type="button" aria-label="Refresh appointments">↻</button>
-              </div>
-            </div>
-
-            <div class="toolbar">
-              <label class="search-box">
-                <span>⌕</span>
-                <input id="search-input" type="search" placeholder="Search patient, doctor, department..." aria-label="Search appointments">
-              </label>
-              <label class="select-wrap">
-                <span class="sr-only">Filter by status</span>
-                <select id="status-filter">
-                  <option value="All">All statuses</option>
-                  <option>Scheduled</option>
-                  <option>Completed</option>
-                  <option>Cancelled</option>
-                </select>
-              </label>
-            </div>
-
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>PATIENT</th>
-                    <th>DOCTOR</th>
-                    <th>DATE &amp; TIME</th>
-                    <th>STATUS</th>
-                    <th><span class="sr-only">Actions</span>ACTIONS</th>
-                  </tr>
-                </thead>
-                <tbody id="appointment-rows"></tbody>
-              </table>
-
-              <div class="empty-state" id="empty-state">
-                <div class="empty-icon">▤</div>
-                <strong id="empty-title">No appointments found</strong>
-                <p id="empty-desc">New appointments will appear here automatically.</p>
-                <a href="#book-appointment">Book your appointment now →</a>
-              </div>
-            </div>
-
-            <div class="table-footer">
-              <span id="results-count">Showing 0 appointments</span>
-              <span>Synced with Excel Sheet <span class="live-dot"></span></span>
-            </div>
-          </article>
-
-          <!-- BOOKING FORM PANEL -->
-          <article class="panel booking-panel" id="book-appointment">
-            <div class="panel-heading">
-              <div>
-                <div class="form-title-icon">＋</div>
-                <h2 id="booking-heading">Book an appointment</h2>
-                <p id="booking-subheading">Select doctor and time to schedule a visit.</p>
-              </div>
-            </div>
-
-            <form id="appointment-form">
-              <label>
-                Patient name <span>*</span>
-                <input name="patient" id="form-patient" type="text" maxlength="80" placeholder="e.g. Alex Morgan" required>
-              </label>
-
-              <div class="form-row">
-                <label>
-                  Phone number <span>*</span>
-                  <input name="phone" id="form-phone" type="tel" maxlength="20" placeholder="+91 98765 43210" required>
-                </label>
-                <label>
-                  Email address <span>*</span>
-                  <input name="email" id="form-email" type="email" maxlength="120" placeholder="alex@email.com" required>
-                </label>
-              </div>
-
-              <div class="form-row">
-                <label>
-                  Department / Specialty <span>*</span>
-                  <select name="department" id="department-select" required>
-                    <option value="">Select department</option>
-                  </select>
-                </label>
-                <label>
-                  Doctor <span>*</span>
-                  <select name="doctor" id="doctor-select" required>
-                    <option value="">Select doctor</option>
-                  </select>
-                </label>
-              </div>
-
-              <div class="form-row">
-                <label>
-                  Appointment date <span>*</span>
-                  <input name="date" id="date-input" type="date" required>
-                </label>
-                <label>
-                  Appointment time <span>*</span>
-                  <select name="time" id="time-select" required>
-                    <option value="">Select time</option>
-                    <option>09:00</option>
-                    <option>09:30</option>
-                    <option>10:00</option>
-                    <option>10:30</option>
-                    <option>11:00</option>
-                    <option>11:30</option>
-                    <option>13:00</option>
-                    <option>13:30</option>
-                    <option>14:00</option>
-                    <option>14:30</option>
-                    <option>15:00</option>
-                    <option>15:30</option>
-                    <option>16:00</option>
-                  </select>
-                </label>
-              </div>
-
-              <label>
-                Reason for visit <span>*</span>
-                <textarea name="reason" id="form-reason" maxlength="300" rows="3" placeholder="Briefly describe symptoms or purpose of the visit..." required></textarea>
-              </label>
-
-              <div class="form-message" id="form-message" role="status" aria-live="polite"></div>
-
-              <button class="submit-button" type="submit" id="submit-appointment-btn">
-                Schedule Appointment <span>→</span>
-              </button>
-
-              <p class="form-note">
-                <span>📊</span> Saved instantly to <strong>Excel sheet (appointments.xlsx)</strong>.
-              </p>
-            </form>
-          </article>
-        </section>
-
-        <footer class="footer">
-          © 2026 CarePoint Hospital <span>•</span> Healthcare Management System with Excel Persistence.
-        </footer>
+      <div class="footer-bottom">
+        <p>© 2026 CarePoint Health System • Hospital Appointment Management System with Excel Persistence.</p>
       </div>
-    </main>
-  </div>
+    </div>
+  </footer>
 
 </body>
 </html>

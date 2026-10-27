@@ -4,10 +4,51 @@ let appointments = [];
 let doctors = [];
 let doctorDepartments = {};
 
-// DOM Elements
-const authScreen = document.querySelector("#auth-screen");
-const appShell = document.querySelector("#app-shell");
+// Doctor image bank for high-quality visuals
+const DOCTOR_IMAGES = {
+  "Dr. Ananya Sharma": "photo-1559839734-2b71ea197ec2",
+  "Dr. Rohan Mehta": "photo-1612349317150-e413f6a5b16d",
+  "Dr. Priya Nair": "photo-1594824476967-48c8b964273f",
+  "Dr. Arjun Patel": "photo-1622253692010-333f2da6031d",
+  "Dr. Meera Iyer": "photo-1582750433449-648ed127bb54",
+  "Dr. Vikram Desai": "photo-1576091160399-112ba8d25d1d",
+  "Dr. Kavita Rao": "photo-1584982751601-97dcc096659c",
+  "Dr. Aisha Khan": "photo-1537368910025-700350fe46c7",
+  "Dr. Rahul Verma": "photo-1622902046580-2b47f47f5471",
+  "Dr. Neha Kulkarni": "photo-1573496359142-b8d87734a5a2",
+  "Dr. Sanjay Joshi": "photo-1551601651-2a8555f1a136",
+  "Dr. Isha Deshmukh": "photo-1584515933487-779824d29309",
+  "Dr. Dev Malhotra": "photo-1591604021695-0c69b7c05981",
+  "Dr. Pooja Menon": "photo-1612531386530-97286d97c2d2",
+  "Dr. Karan Shah": "photo-1612277795421-9bc7706a4a34",
+  "Dr. Maya Banerjee": "photo-1606811971618-4486d14f3f99",
+  "Dr. Nikhil Sinha": "photo-1631815588090-d4bfec5b1ccb",
+  "Dr. Simran Gill": "photo-1494790108377-be9c29b29330",
+  "Dr. Farhan Ali": "photo-1506794778202-cad84cf45f1d",
+  "Dr. Tara Kapoor": "photo-1524504388940-b1c1722653e1"
+};
 
+// DOM References
+const viewHome = document.querySelector("#view-home");
+const viewDashboard = document.querySelector("#view-dashboard");
+const authModal = document.querySelector("#auth-modal");
+
+const btnNavHome = document.querySelector("#btn-nav-home");
+const btnNavDoctors = document.querySelector("#btn-nav-doctors");
+const btnNavFacilities = document.querySelector("#btn-nav-facilities");
+const btnNavDashboard = document.querySelector("#btn-nav-dashboard");
+const btnBackToHome = document.querySelector("#btn-back-to-home");
+
+const navUserPill = document.querySelector("#nav-user-pill");
+const navAuthButtons = document.querySelector("#nav-auth-buttons");
+const navAvatar = document.querySelector("#nav-avatar");
+const navUserName = document.querySelector("#nav-user-name");
+const navUserRole = document.querySelector("#nav-user-role");
+const navLogoutBtn = document.querySelector("#nav-logout-btn");
+
+const openLoginBtn = document.querySelector("#open-login-btn");
+const openRegisterBtn = document.querySelector("#open-register-btn");
+const modalCloseBtn = document.querySelector("#modal-close-btn");
 const tabLogin = document.querySelector("#tab-login");
 const tabRegister = document.querySelector("#tab-register");
 const loginForm = document.querySelector("#login-form");
@@ -17,7 +58,6 @@ const registerMessage = document.querySelector("#register-message");
 
 const demoStaffBtn = document.querySelector("#demo-staff-btn");
 const demoPatientBtn = document.querySelector("#demo-patient-btn");
-
 const roleChoicePatient = document.querySelector("#role-choice-patient");
 const roleChoiceStaff = document.querySelector("#role-choice-staff");
 const staffFields = document.querySelector("#staff-fields");
@@ -29,28 +69,20 @@ const searchInput = document.querySelector("#search-input");
 const statusFilter = document.querySelector("#status-filter");
 const formMessage = document.querySelector("#form-message");
 const refreshBtn = document.querySelector("#refresh-button");
-const logoutBtn = document.querySelector("#logout-button");
-const topbarLogoutBtn = document.querySelector("#topbar-logout-btn");
 
-// Initialize date displays
-const today = new Date();
-const todayFormatted = new Intl.DateTimeFormat("en", {
-  weekday: "short", month: "short", day: "numeric", year: "numeric"
-}).format(today);
-const todayLabel = document.querySelector("#today-label");
-if (todayLabel) todayLabel.textContent = todayFormatted;
-
-const dateInput = document.querySelector("#date-input");
-if (dateInput) {
-  dateInput.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
-    .toISOString().slice(0, 10);
+// Helpers
+function escapeHtml(val) {
+  if (val === null || val === undefined) return "";
+  return String(val).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[c]);
 }
 
-function escapeHtml(value) {
-  if (value === null || value === undefined) return "";
-  return String(value).replace(/[&<>"']/g, character => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-  })[character]);
+function getInitials(name) {
+  if (!name) return "CP";
+  const p = name.trim().split(" ");
+  if (p.length >= 2) return (p[0][0] + p[p.length - 1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
 }
 
 async function request(url, options = {}) {
@@ -59,159 +91,171 @@ async function request(url, options = {}) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
   options.headers = headers;
-
-  const response = await fetch(url, options);
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.error || "An error occurred. Please try again.");
-  }
+  const res = await fetch(url, options);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "An error occurred. Please try again.");
   return data;
 }
 
 // -----------------------------------------------------------------------------
-// AUTHENTICATION & SESSIONS
+// VIEW SWITCHING
 // -----------------------------------------------------------------------------
-
-function getInitials(name) {
-  if (!name) return "US";
-  const parts = name.trim().split(" ");
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+function showView(viewName) {
+  if (viewName === "dashboard") {
+    if (!currentUser) {
+      openAuthModal("login");
+      return;
+    }
+    viewHome.style.display = "none";
+    viewDashboard.style.display = "block";
+    btnNavDashboard.classList.add("active");
+    btnNavHome.classList.remove("active");
+    btnNavDoctors.classList.remove("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    refreshAppointments();
+  } else {
+    viewDashboard.style.display = "none";
+    viewHome.style.display = "block";
+    btnNavHome.classList.add("active");
+    btnNavDashboard.classList.remove("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
-  return name.slice(0, 2).toUpperCase();
+}
+
+// -----------------------------------------------------------------------------
+// AUTHENTICATION MODAL LOGIC
+// -----------------------------------------------------------------------------
+function openAuthModal(tab = "login") {
+  authModal.style.display = "flex";
+  if (tab === "register") {
+    tabRegister.click();
+  } else {
+    tabLogin.click();
+  }
+}
+
+function closeAuthModal() {
+  authModal.style.display = "none";
+  loginMessage.className = "form-feedback";
+  loginMessage.textContent = "";
+  registerMessage.className = "form-feedback";
+  registerMessage.textContent = "";
 }
 
 async function checkAuth() {
   if (!authToken) {
-    showAuthScreen();
+    updateNavAuthState();
     return;
   }
-
   try {
-    const res = await request("/api/auth/me");
-    currentUser = res.user;
-    showAppShell();
-    await initializeDashboard();
-  } catch (err) {
-    console.warn("Session check failed, requiring sign in:", err.message);
+    const data = await request("/api/auth/me");
+    currentUser = data.user;
+    updateNavAuthState();
+    applyRoleTheme();
+  } catch {
     authToken = "";
+    currentUser = null;
     localStorage.removeItem("carepoint_token");
-    showAuthScreen();
+    updateNavAuthState();
   }
 }
 
-function showAuthScreen() {
-  authScreen.style.display = "flex";
-  appShell.style.display = "none";
-}
-
-function showAppShell() {
-  authScreen.style.display = "none";
-  appShell.style.display = "flex";
+function updateNavAuthState() {
   updateExcelLinks();
+  if (currentUser) {
+    navAuthButtons.style.display = "none";
+    navUserPill.style.display = "flex";
+    navAvatar.textContent = getInitials(currentUser.name);
+    navUserName.textContent = currentUser.name;
+    navUserRole.textContent = currentUser.role === "STAFF" ? "Staff" : "Patient";
+    document.querySelector("#nav-dash-text").textContent =
+      currentUser.role === "STAFF" ? "Staff Dashboard" : "My Appointments";
+  } else {
+    navAuthButtons.style.display = "flex";
+    navUserPill.style.display = "none";
+    document.querySelector("#nav-dash-text").textContent = "Appointments Dashboard";
+  }
 }
 
 function updateExcelLinks() {
   const tokenParam = authToken ? `?token=${encodeURIComponent(authToken)}` : "";
-  const excelLinks = [
-    "#header-export-excel",
-    "#banner-download-excel",
-    "#panel-export-excel",
-    "#nav-excel"
+  const selectors = [
+    "#nav-excel-download",
+    "#dash-btn-excel"
   ];
-  excelLinks.forEach(selector => {
-    const el = document.querySelector(selector);
+  selectors.forEach(sel => {
+    const el = document.querySelector(sel);
     if (el) el.href = `/api/appointments/export-excel${tokenParam}`;
   });
+  const csvEl = document.querySelector("#dash-btn-csv");
+  if (csvEl) csvEl.href = `/api/appointments/export-csv${tokenParam}`;
+}
 
-  const csvLinks = ["#header-export-csv", "#banner-download-csv"];
-  csvLinks.forEach(selector => {
-    const el = document.querySelector(selector);
-    if (el) el.href = `/api/appointments/export-csv${tokenParam}`;
-  });
+async function logout() {
+  try {
+    await request("/api/auth/logout", { method: "POST" });
+  } catch {}
+  authToken = "";
+  currentUser = null;
+  localStorage.removeItem("carepoint_token");
+  updateNavAuthState();
+  showView("home");
 }
 
 function onAuthSuccess(token, user) {
   authToken = token;
   currentUser = user;
   localStorage.setItem("carepoint_token", token);
-  showAppShell();
-  initializeDashboard();
+  closeAuthModal();
+  updateNavAuthState();
+  applyRoleTheme();
+  showView("dashboard");
 }
 
-async function logout() {
-  try {
-    await request("/api/auth/logout", { method: "POST" });
-  } catch (e) {
-    // Ignore error
-  }
-  authToken = "";
-  currentUser = null;
-  localStorage.removeItem("carepoint_token");
-  showAuthScreen();
-}
-
-// -----------------------------------------------------------------------------
-// UI RENDERING BASED ON USER ROLE (STAFF VS PATIENT)
-// -----------------------------------------------------------------------------
-
+// Role adaptation in Dashboard
 function applyRoleTheme() {
   if (!currentUser) return;
   const isStaff = currentUser.role === "STAFF" || currentUser.role === "ADMIN";
-  const initials = getInitials(currentUser.name);
 
-  // Avatar and names
-  document.querySelector("#user-avatar").textContent = initials;
-  document.querySelector("#top-avatar").textContent = initials;
-  document.querySelector("#user-name").textContent = currentUser.name;
-  document.querySelector("#top-user-name").textContent = currentUser.name;
-  document.querySelector("#welcome-user-name").textContent = currentUser.name;
-
-  const roleTag = document.querySelector("#sidebar-role-tag");
-  const portalName = document.querySelector("#sidebar-portal-name");
-  const userRoleDesc = document.querySelector("#user-role-desc");
-  const breadcrumbTitle = document.querySelector("#breadcrumb-title");
-  const appointmentsPanelTitle = document.querySelector("#appointments-panel-title");
-  const appointmentsPanelDesc = document.querySelector("#appointments-panel-desc");
+  const greeting = document.querySelector("#dash-greeting");
+  const subtitle = document.querySelector("#dash-subtitle");
+  const rolePill = document.querySelector("#dash-role-pill");
+  const portalSub = document.querySelector("#dash-portal-subtext");
+  const apptTitle = document.querySelector("#appointments-title");
+  const apptDesc = document.querySelector("#appointments-desc");
+  const labelTotal = document.querySelector("#label-stat-total");
   const bookingHeading = document.querySelector("#booking-heading");
   const bookingSubheading = document.querySelector("#booking-subheading");
-  const navAppointmentsText = document.querySelector("#nav-appointments-text");
-  const statLabelTotal = document.querySelector("#stat-label-total");
 
   if (isStaff) {
-    roleTag.textContent = "STAFF";
-    roleTag.className = "role-tag";
-    portalName.textContent = "Staff Portal";
-    userRoleDesc.textContent = `Staff (${currentUser.department || "Admin"})`;
-    breadcrumbTitle.textContent = "Staff Dashboard";
-    appointmentsPanelTitle.textContent = "Hospital Appointments";
-    appointmentsPanelDesc.textContent = "Manage and track all patient visits.";
-    bookingHeading.textContent = "Schedule an appointment";
-    bookingSubheading.textContent = "Enter patient details for visit.";
-    navAppointmentsText.textContent = "All Appointments";
-    statLabelTotal.textContent = "Total Appointments";
+    rolePill.textContent = "STAFF DASHBOARD";
+    rolePill.className = "role-pill-indicator";
+    portalSub.textContent = `Hospital Administration • ${currentUser.department || "General"}`;
+    greeting.innerHTML = `Good day, ${escapeHtml(currentUser.name)} <span class="wave">✦</span>`;
+    subtitle.textContent = "Complete hospital appointments directory with live Excel sheet integration.";
+    apptTitle.textContent = "Hospital Appointments Directory";
+    apptDesc.textContent = "Manage, verify and update patient consultations.";
+    labelTotal.textContent = "Total Appointments";
+    bookingHeading.textContent = "Schedule Walk-In / Visit";
+    bookingSubheading.textContent = "Book appointment on behalf of any patient.";
 
-    // Form can be empty for staff
     document.querySelector("#form-patient").value = "";
     document.querySelector("#form-phone").value = "";
     document.querySelector("#form-email").value = "";
     document.querySelector("#form-patient").readOnly = false;
     document.querySelector("#form-email").readOnly = false;
   } else {
-    // Patient Portal
-    roleTag.textContent = "PATIENT";
-    roleTag.className = "role-tag patient";
-    portalName.textContent = "Patient Portal";
-    userRoleDesc.textContent = "Patient Account";
-    breadcrumbTitle.textContent = "Patient Portal";
-    appointmentsPanelTitle.textContent = "My Booked Appointments";
-    appointmentsPanelDesc.textContent = "Your booked visits with CarePoint specialists.";
+    rolePill.textContent = "PATIENT PORTAL";
+    rolePill.className = "role-pill-indicator patient";
+    portalSub.textContent = "Personal Health Account";
+    greeting.innerHTML = `Welcome back, ${escapeHtml(currentUser.name)} <span class="wave">✦</span>`;
+    subtitle.textContent = "Manage your booked appointments and schedule new specialist visits.";
+    apptTitle.textContent = "My Booked Appointments";
+    apptDesc.textContent = "List of your upcoming and past doctor visits.";
+    labelTotal.textContent = "My Appointments";
     bookingHeading.textContent = "Book Your Appointment";
-    bookingSubheading.textContent = "Select doctor and preferred time slot.";
-    navAppointmentsText.textContent = "My Appointments";
-    statLabelTotal.textContent = "My Appointments";
+    bookingSubheading.textContent = "Select specialist and choose your preferred slot.";
 
-    // Pre-fill patient details
     document.querySelector("#form-patient").value = currentUser.name;
     document.querySelector("#form-phone").value = currentUser.phone || "";
     document.querySelector("#form-email").value = currentUser.email;
@@ -220,44 +264,109 @@ function applyRoleTheme() {
 }
 
 // -----------------------------------------------------------------------------
-// APPOINTMENTS & DOCTORS LOGIC
+// PUBLIC HOME: DOCTORS DIRECTORY & SEARCH
 // -----------------------------------------------------------------------------
-
-async function loadDoctors() {
+async function loadDoctorsData() {
   const data = await request("/api/doctors");
-  doctorDepartments = data.doctorDepartments;
   doctors = data.doctors;
+  doctorDepartments = data.doctorDepartments;
 
-  const departmentSelect = document.querySelector("#department-select");
-  departmentSelect.replaceChildren(new Option("Select department", ""));
+  // Populate booking form departments
+  const deptSelect = document.querySelector("#department-select");
+  deptSelect.replaceChildren(new Option("Select Department", ""));
   for (const dept of data.departments) {
-    departmentSelect.append(new Option(dept, dept));
+    deptSelect.append(new Option(dept, dept));
   }
+  populateFormDoctors("");
 
-  populateDoctors("");
-
-  departmentSelect.addEventListener("change", event => {
-    populateDoctors(event.target.value);
-  });
-
-  document.querySelector("#doctor-select").addEventListener("change", event => {
-    const dept = doctorDepartments[event.target.value];
+  deptSelect.addEventListener("change", e => populateFormDoctors(e.target.value));
+  document.querySelector("#doctor-select").addEventListener("change", e => {
+    const dept = doctorDepartments[e.target.value];
     if (dept) {
-      departmentSelect.value = dept;
-      populateDoctors(dept, event.target.value);
+      deptSelect.value = dept;
+      populateFormDoctors(dept, e.target.value);
     }
   });
+
+  // Populate public home department chips
+  const chipsContainer = document.querySelector("#department-chips");
+  for (const dept of data.departments) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dept-chip";
+    btn.dataset.dept = dept;
+    btn.textContent = dept;
+    chipsContainer.append(btn);
+  }
+
+  // Render Doctor Cards on Home
+  renderDoctorCards("All", "");
 }
 
-function populateDoctors(department, selectedDoctor = "") {
+function renderDoctorCards(filterDept = "All", searchQuery = "") {
+  const container = document.querySelector("#doctor-cards-container");
+  container.innerHTML = "";
+
+  const query = searchQuery.trim().toLowerCase();
+
+  const filtered = doctors.filter(name => {
+    const dept = doctorDepartments[name] || "Specialist";
+    const matchDept = (filterDept === "All" || dept.toLowerCase() === filterDept.toLowerCase());
+    const matchQuery = !query || name.toLowerCase().includes(query) || dept.toLowerCase().includes(query);
+    return matchDept && matchQuery;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#64748b;padding:30px;">No specialists found matching your search. Try another department.</p>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(name => {
+    const dept = doctorDepartments[name] || "General";
+    const imgId = DOCTOR_IMAGES[name] || "photo-1559839734-2b71ea197ec2";
+    const imgUrl = `https://images.unsplash.com/${imgId}?auto=format&fit=crop&w=150&h=150&q=80`;
+
+    return `
+      <article class="doctor-card">
+        <div class="doc-top">
+          <img class="doc-img" src="${imgUrl}" alt="${escapeHtml(name)}">
+          <div>
+            <h3 class="doc-name">${escapeHtml(name)}</h3>
+            <p class="doc-spec">${escapeHtml(dept)} Specialist</p>
+          </div>
+        </div>
+        <div class="doc-meta">
+          <span class="doc-dept-badge">${escapeHtml(dept)}</span>
+          <button type="button" class="doc-book-btn" data-doc="${escapeHtml(name)}" data-dept="${escapeHtml(dept)}">
+            Book Visit ↗
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function populateFormDoctors(department, selectedDoctor = "") {
   const select = document.querySelector("#doctor-select");
-  select.replaceChildren(new Option("Select doctor", ""));
-  for (const doctor of doctors) {
-    if (!department || doctorDepartments[doctor] === department) {
-      select.append(new Option(doctor, doctor));
+  select.replaceChildren(new Option("Select Doctor", ""));
+  for (const doc of doctors) {
+    if (!department || doctorDepartments[doc] === department) {
+      select.append(new Option(doc, doc));
     }
   }
   if (selectedDoctor) select.value = selectedDoctor;
+}
+
+// -----------------------------------------------------------------------------
+// DASHBOARD: APPOINTMENTS CRUD & EXCEL SYNC
+// -----------------------------------------------------------------------------
+async function refreshAppointments() {
+  try {
+    appointments = await request("/api/appointments");
+    renderAppointmentsTable();
+  } catch (err) {
+    console.error("Appointments fetch error:", err);
+  }
 }
 
 function updateStats() {
@@ -273,15 +382,15 @@ function updateStats() {
     appointments.filter(a => a.date === todayStr && a.status !== "Cancelled").length;
 }
 
-function renderAppointments() {
+function renderAppointmentsTable() {
   const isStaff = currentUser && (currentUser.role === "STAFF" || currentUser.role === "ADMIN");
   const query = searchInput.value.trim().toLowerCase();
   const status = statusFilter.value;
 
-  const filtered = appointments.filter(item => {
-    const matchesText = [item.patient, item.doctor, item.department, item.phone, item.email]
+  const filtered = appointments.filter(a => {
+    const textMatch = [a.patient, a.doctor, a.department, a.phone, a.email]
       .some(val => val && val.toLowerCase().includes(query));
-    return matchesText && (status === "All" || item.status === status);
+    return textMatch && (status === "All" || a.status === status);
   }).sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
 
   rows.innerHTML = filtered.map(item => {
@@ -293,41 +402,40 @@ function renderAppointments() {
       hour: "numeric", minute: "2-digit"
     });
 
-    let actionsHtml = "";
+    let actionMarkup = "";
     if (isStaff) {
-      actionsHtml = `
-        <select id="status-${item.id}" data-status-id="${item.id}" aria-label="Update status">
+      actionMarkup = `
+        <select class="action-select" data-status-id="${item.id}" aria-label="Update status">
           ${["Scheduled", "Completed", "Cancelled"].map(val =>
             `<option${item.status === val ? " selected" : ""}>${val}</option>`).join("")}
         </select>
-        <button class="delete-button" type="button" data-delete-id="${item.id}" title="Delete appointment" aria-label="Delete appointment">×</button>
+        <button class="btn-del" type="button" data-delete-id="${item.id}" title="Delete record">×</button>
       `;
     } else {
-      // Patient action
       if (item.status === "Scheduled") {
-        actionsHtml = `
-          <button class="cancel-visit-btn" type="button" data-cancel-id="${item.id}">Cancel Visit</button>
-        `;
+        actionMarkup = `<button type="button" class="btn-cancel-appt" data-cancel-id="${item.id}">Cancel Visit</button>`;
       } else {
-        actionsHtml = `<span style="font-size:10px;color:#a0aab5;">—</span>`;
+        actionMarkup = `<span style="color:#94a3b8;font-size:10px;">—</span>`;
       }
     }
 
     return `<tr>
-      <td>
-        <span class="patient-name">${escapeHtml(item.patient)}</span>
-        <span class="patient-contact">${escapeHtml(item.phone)}</span>
+      <td class="patient-cell">
+        <strong>${escapeHtml(item.patient)}</strong>
+        <small>${escapeHtml(item.phone)} • ${escapeHtml(item.email)}</small>
+      </td>
+      <td class="doc-cell">
+        <strong>${escapeHtml(item.doctor)}</strong>
+        <small>${escapeHtml(item.department)}</small>
+      </td>
+      <td class="time-cell">
+        <strong>${escapeHtml(dateFormatted)}</strong>
+        <small>${escapeHtml(timeFormatted)}</small>
       </td>
       <td>
-        <span class="doctor-name">${escapeHtml(item.doctor)}</span>
-        <span class="doctor-department">${escapeHtml(item.department)}</span>
+        <span class="status-tag ${statusClass}">${escapeHtml(item.status)}</span>
       </td>
-      <td>
-        ${escapeHtml(dateFormatted)}
-        <span class="appointment-time">${escapeHtml(timeFormatted)}</span>
-      </td>
-      <td><span class="status-pill ${statusClass}">${escapeHtml(item.status)}</span></td>
-      <td class="actions">${actionsHtml}</td>
+      <td>${actionMarkup}</td>
     </tr>`;
   }).join("");
 
@@ -337,31 +445,45 @@ function renderAppointments() {
   updateStats();
 }
 
-async function refreshAppointments() {
-  try {
-    appointments = await request("/api/appointments");
-    renderAppointments();
-  } catch (err) {
-    console.error("Failed to load appointments:", err);
-  }
-}
-
-async function initializeDashboard() {
-  applyRoleTheme();
-  await Promise.all([loadDoctors(), refreshAppointments()]);
-}
-
 // -----------------------------------------------------------------------------
-// EVENT LISTENERS: AUTH SCREEN
+// EVENT LISTENERS
 // -----------------------------------------------------------------------------
 
-// Tabs: Sign In / Create Account
+// Nav Links
+btnNavHome.addEventListener("click", e => { e.preventDefault(); showView("home"); });
+btnNavDoctors.addEventListener("click", e => {
+  e.preventDefault();
+  showView("home");
+  document.querySelector("#specialists").scrollIntoView({ behavior: "smooth" });
+});
+btnNavFacilities.addEventListener("click", e => {
+  e.preventDefault();
+  showView("home");
+  document.querySelector("#facilities").scrollIntoView({ behavior: "smooth" });
+});
+btnNavDashboard.addEventListener("click", e => { e.preventDefault(); showView("dashboard"); });
+btnBackToHome.addEventListener("click", () => showView("home"));
+
+// Auth Modal Open/Close
+openLoginBtn.addEventListener("click", () => openAuthModal("login"));
+openRegisterBtn.addEventListener("click", () => openAuthModal("register"));
+document.querySelector("#btn-hero-book")?.addEventListener("click", () => {
+  if (currentUser) showView("dashboard");
+  else openAuthModal("register");
+});
+modalCloseBtn.addEventListener("click", closeAuthModal);
+authModal.addEventListener("click", e => {
+  if (e.target === authModal) closeAuthModal();
+});
+navLogoutBtn.addEventListener("click", logout);
+
+// Tabs in Auth Modal
 tabLogin.addEventListener("click", () => {
   tabLogin.classList.add("active");
   tabRegister.classList.remove("active");
   loginForm.style.display = "grid";
   registerForm.style.display = "none";
-  loginMessage.className = "auth-message";
+  loginMessage.className = "form-feedback";
   loginMessage.textContent = "";
 });
 
@@ -370,7 +492,7 @@ tabRegister.addEventListener("click", () => {
   tabLogin.classList.remove("active");
   registerForm.style.display = "grid";
   loginForm.style.display = "none";
-  registerMessage.className = "auth-message";
+  registerMessage.className = "form-feedback";
   registerMessage.textContent = "";
 });
 
@@ -391,7 +513,7 @@ demoPatientBtn.addEventListener("click", () => {
   loginForm.dispatchEvent(new Event("submit"));
 });
 
-// Register Role Selection Cards
+// Register Role Selection
 roleChoicePatient.addEventListener("click", () => {
   roleChoicePatient.classList.add("active");
   roleChoiceStaff.classList.remove("active");
@@ -406,38 +528,37 @@ roleChoiceStaff.addEventListener("click", () => {
   staffFields.style.display = "block";
 });
 
-// Submit Login Form
-loginForm.addEventListener("submit", async event => {
-  event.preventDefault();
-  loginMessage.className = "auth-message";
+// Submit Login
+loginForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  loginMessage.className = "form-feedback";
   loginMessage.textContent = "";
-  const submitBtn = document.querySelector("#login-submit-btn");
-  submitBtn.disabled = true;
+  const btn = document.querySelector("#login-submit-btn");
+  btn.disabled = true;
 
   try {
-    const selectedRole = loginForm.querySelector("input[name=loginRole]:checked")?.value || "";
+    const role = loginForm.querySelector("input[name=loginRole]:checked")?.value || "";
     const email = document.querySelector("#login-email").value.trim();
     const password = document.querySelector("#login-password").value;
 
     const data = await request("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-      body: new URLSearchParams({ email, password, role: selectedRole })
+      body: new URLSearchParams({ email, password, role })
     });
-
     onAuthSuccess(data.token, data.user);
   } catch (err) {
     loginMessage.textContent = err.message;
     loginMessage.classList.add("error");
   } finally {
-    submitBtn.disabled = false;
+    btn.disabled = false;
   }
 });
 
-// Submit Create Account Form
-registerForm.addEventListener("submit", async event => {
-  event.preventDefault();
-  registerMessage.className = "auth-message";
+// Submit Register
+registerForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  registerMessage.className = "form-feedback";
   registerMessage.textContent = "";
 
   const password = document.querySelector("#reg-password").value;
@@ -449,8 +570,8 @@ registerForm.addEventListener("submit", async event => {
     return;
   }
 
-  const submitBtn = document.querySelector("#register-submit-btn");
-  submitBtn.disabled = true;
+  const btn = document.querySelector("#register-submit-btn");
+  btn.disabled = true;
 
   try {
     const role = registerForm.querySelector("input[name=registerRole]:checked")?.value || "PATIENT";
@@ -464,29 +585,69 @@ registerForm.addEventListener("submit", async event => {
       headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
       body: new URLSearchParams({ name, email, phone, role, department, password })
     });
-
     onAuthSuccess(data.token, data.user);
   } catch (err) {
     registerMessage.textContent = err.message;
     registerMessage.classList.add("error");
   } finally {
-    submitBtn.disabled = false;
+    btn.disabled = false;
   }
 });
 
-// Logout Buttons
-logoutBtn.addEventListener("click", logout);
-topbarLogoutBtn.addEventListener("click", logout);
+// Home page doctor search
+document.querySelector("#hero-doctor-search").addEventListener("submit", e => {
+  e.preventDefault();
+  const q = document.querySelector("#hero-search-input").value;
+  document.querySelector("#specialists").scrollIntoView({ behavior: "smooth" });
+  renderDoctorCards("All", q);
+});
 
-// -----------------------------------------------------------------------------
-// EVENT LISTENERS: APPOINTMENT ACTIONS
-// -----------------------------------------------------------------------------
+document.querySelector("#hero-search-input").addEventListener("input", e => {
+  renderDoctorCards("All", e.target.value);
+});
 
-// Submit Appointment Form
-form.addEventListener("submit", async event => {
-  event.preventDefault();
+// Quick specialty tags in hero
+document.querySelectorAll(".tag-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    const spec = chip.dataset.specialty;
+    document.querySelector("#specialists").scrollIntoView({ behavior: "smooth" });
+    document.querySelectorAll(".dept-chip").forEach(c => c.classList.toggle("active", c.dataset.dept === spec));
+    renderDoctorCards(spec, "");
+  });
+});
+
+// Department chips in Specialists section
+document.querySelector("#department-chips").addEventListener("click", e => {
+  const chip = e.target.closest(".dept-chip");
+  if (!chip) return;
+  document.querySelectorAll(".dept-chip").forEach(c => c.classList.remove("active"));
+  chip.classList.add("active");
+  renderDoctorCards(chip.dataset.dept, "");
+});
+
+// Doctor card Book Visit click
+document.querySelector("#doctor-cards-container").addEventListener("click", e => {
+  const btn = e.target.closest(".doc-book-btn");
+  if (!btn) return;
+  const doc = btn.dataset.doc;
+  const dept = btn.dataset.dept;
+
+  if (!currentUser) {
+    openAuthModal("login");
+    return;
+  }
+
+  showView("dashboard");
+  document.querySelector("#department-select").value = dept;
+  populateFormDoctors(dept, doc);
+  document.querySelector("#book-form").scrollIntoView({ behavior: "smooth" });
+});
+
+// Booking form submit
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  formMessage.className = "form-feedback";
   formMessage.textContent = "";
-  formMessage.className = "form-message";
   const submitBtn = document.querySelector("#submit-appointment-btn");
   submitBtn.disabled = true;
 
@@ -508,7 +669,7 @@ form.addEventListener("submit", async event => {
       document.querySelector("#time-select").value = "";
     }
 
-    formMessage.textContent = "Appointment scheduled successfully and recorded in Excel!";
+    formMessage.textContent = "Appointment scheduled successfully and saved to Excel sheet (appointments.xlsx)!";
     formMessage.classList.add("success");
     await refreshAppointments();
   } catch (err) {
@@ -519,15 +680,15 @@ form.addEventListener("submit", async event => {
   }
 });
 
-// Staff updates status dropdown
-rows.addEventListener("change", async event => {
-  const id = event.target.dataset.statusId;
+// Staff updates appointment status dropdown
+rows.addEventListener("change", async e => {
+  const id = e.target.dataset.statusId;
   if (!id) return;
   try {
     await request(`/api/appointments/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-      body: new URLSearchParams({ status: event.target.value })
+      body: new URLSearchParams({ status: e.target.value })
     });
     await refreshAppointments();
   } catch (err) {
@@ -536,14 +697,12 @@ rows.addEventListener("change", async event => {
   }
 });
 
-// Staff deletes appointment OR Patient cancels visit
-rows.addEventListener("click", async event => {
-  // Staff Delete
-  const deleteBtn = event.target.closest("[data-delete-id]");
-  if (deleteBtn) {
-    const id = Number(deleteBtn.dataset.deleteId);
-    const appointment = appointments.find(item => item.id === id);
-    if (!appointment || !window.confirm(`Delete the appointment for ${appointment.patient}?`)) return;
+// Staff deletes OR Patient cancels appointment
+rows.addEventListener("click", async e => {
+  const delBtn = e.target.closest("[data-delete-id]");
+  if (delBtn) {
+    const id = Number(delBtn.dataset.deleteId);
+    if (!window.confirm("Are you sure you want to delete this appointment record?")) return;
     try {
       await request(`/api/appointments/${id}`, { method: "DELETE" });
       await refreshAppointments();
@@ -553,11 +712,10 @@ rows.addEventListener("click", async event => {
     return;
   }
 
-  // Patient Cancel Visit
-  const cancelBtn = event.target.closest("[data-cancel-id]");
+  const cancelBtn = e.target.closest("[data-cancel-id]");
   if (cancelBtn) {
     const id = Number(cancelBtn.dataset.cancelId);
-    if (!window.confirm("Are you sure you want to cancel this appointment visit?")) return;
+    if (!window.confirm("Are you sure you want to cancel your scheduled appointment visit?")) return;
     try {
       await request(`/api/appointments/${id}`, {
         method: "PATCH",
@@ -571,10 +729,16 @@ rows.addEventListener("click", async event => {
   }
 });
 
-// Search & Filter
-searchInput.addEventListener("input", renderAppointments);
-statusFilter.addEventListener("change", renderAppointments);
+// Search & Status filters in Dashboard
+searchInput.addEventListener("input", renderAppointmentsTable);
+statusFilter.addEventListener("change", renderAppointmentsTable);
 refreshBtn.addEventListener("click", refreshAppointments);
 
-// Start app
-checkAuth();
+// Date min attribute setup
+const todayStr = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+  .toISOString().slice(0, 10);
+const datePicker = document.querySelector("#date-input");
+if (datePicker) datePicker.min = todayStr;
+
+// Initialize Application
+Promise.all([checkAuth(), loadDoctorsData()]).catch(console.error);
