@@ -3,6 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "java": "run.bat"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  },
   "engines": {
     "node": ">=20"
   }

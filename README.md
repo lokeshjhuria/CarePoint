@@ -1,57 +1,76 @@
-# CarePoint Health
+# CarePoint Health - Hospital Appointment Management System
 
-A responsive hospital appointment website inspired by the healthcare reference shared for this project. The Vercel version has an image-rich public landing page, search across 20 doctors in 20 specialties/departments, appointment requests, and a password-protected staff appointment panel for administrator Omkar Fandade.
+A Java-based Hospital Appointment Management System with user authentication (Staff & Patient roles) and automated Excel sheet (`.xlsx`) data storage.
 
-## Deploy to Vercel
+---
 
-### 1. Create the appointment database
+## 🌟 Key Features
 
-1. Create a Supabase project at [supabase.com](https://supabase.com/).
-2. In **SQL Editor**, run the contents of [`database/schema.sql`](./database/schema.sql). The schema enables row-level security and makes active doctor/time slots unique.
-3. In the Supabase project settings, copy the **Project URL** and **service_role** key. Keep the service-role key secret; it is only used by server-side API functions.
+1. **Authentication & Roles**:
+   - **Login Page & Create Account Page** with role-based routing.
+   - **🧑‍⚕️ Staff Role**: Full hospital dashboard, view all appointments, filter/search visits, change appointment status (Scheduled, Completed, Cancelled), delete appointments, schedule walk-ins, and export Excel reports.
+   - **👤 Patient Role**: Dedicated patient portal, book doctor appointments across 20 specialties, view personal booked appointments, cancel visits, and export personal appointments.
 
-### 2. Add environment variables
+2. **📊 Real-time Excel Sheet Data Storage**:
+   - Every appointment booked, updated, or cancelled is **automatically saved into Microsoft Excel format**: `data/appointments.xlsx`.
+   - Also automatically generates a comma-separated `data/appointments.csv` file.
+   - Excel export headers include: `Appointment ID`, `Patient Name`, `Phone Number`, `Email Address`, `Department`, `Doctor Name`, `Appointment Date`, `Appointment Time`, `Reason for Visit`, `Status`, `Booked By Role`, `Booked By Account`, and `Created At`.
+   - **Direct Browser Download**: Click the **Download Excel (.xlsx)** button in the top bar or dashboard to download the live spreadsheet anytime.
 
-In Vercel, open **Project → Settings → Environment Variables** and add these for Preview and Production:
+3. **Pre-configured Demo Accounts**:
+   - **Staff / Administrator**:
+     - Email: `staff@carepoint.com`
+     - Password: `admin123`
+     - Role: `STAFF` (Administration)
+   - **Patient**:
+     - Email: `patient@carepoint.com`
+     - Password: `patient123`
+     - Role: `PATIENT`
+   - *You can also create new accounts directly via the **Create Account** tab!*
 
-| Name | Value |
-| --- | --- |
-| `SUPABASE_URL` | Your Supabase Project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Your server-side Supabase service-role key |
-| `ADMIN_PASSWORD` | A long, unique staff dashboard password |
+---
 
-`ADMIN_PASSWORD` protects staff access and signs temporary eight-hour sessions. Do not put these secrets in browser code or commit them to source control.
+## 🚀 How to Run the Java Application
 
-### 3. Deploy
+### Prerequisites
+- Java JDK 17 or higher (tested with Java 26 / JDK 21+).
 
-Import this folder as a Vercel project. Choose the **Other** framework preset; no build command or output directory is needed. Deploy the project, then add or verify the environment variables and redeploy.
+### Steps
+1. Open PowerShell or Command Prompt.
+2. Navigate to the project directory:
+   ```powershell
+   cd "C:\Users\lokes\Downloads\oops java\CarePoint"
+   ```
+3. Run `run.bat`:
+   ```cmd
+   .\run.bat
+   ```
+   *Or simply double-click `run.bat` in Windows File Explorer.*
+4. Open your browser and visit:
+   [http://localhost:8080](http://localhost:8080)
+5. Log in using a demo account or click **Create Account** to register as either a Patient or Staff.
 
-To use the Vercel CLI instead, install it, set the same environment variables in the Vercel project, then run `vercel` from this folder.
+---
 
-### 4. Try the site
+## 📁 Project Architecture (Object-Oriented Java)
 
-- The home page and doctor search are public.
-- Book a visit using a doctor card or the call-to-action near the bottom of the page.
-- Reach the front desk at **+91 95799 75307**.
-- Use **Staff log in** and the `ADMIN_PASSWORD` to view, update, and delete appointment requests.
-- Appointment requests are stored in Supabase; the Vercel serverless functions use the service-role key, while unauthenticated visitors cannot read the appointment list.
-
-## Local Java version
-
-The original standalone Java appointment dashboard remains available. It uses only JDK 17+ and stores local data in `data\appointments.tsv`.
-
-1. Double-click [`run.bat`](./run.bat) or run `.\run.bat` in PowerShell.
-2. Visit [http://localhost:8080](http://localhost:8080).
-3. Stop the server with Ctrl+C.
-
-The local Java app is separate from the Vercel version; Vercel does not provide a native Java serverless runtime. The deployable API therefore uses native JavaScript Vercel Functions.
-
-## Project files
-
-- `index.html`, `styles.css`, `app.js` — responsive public site, search, booking, and staff UI.
-- `api/` — Vercel API functions, validation, Supabase access, and staff sessions.
-- `database/schema.sql` — Supabase table, row-level security, and unique appointment slot index.
-- `vercel.json` — function and response-header configuration.
-- `src/main/` and `run.bat` — standalone Java version for local coursework demos.
-
-The doctor and patient images are served by Unsplash, and the fonts are served by Google Fonts; the deployed site needs an internet connection to load them. This is a college-project demonstration, not production healthcare software. Do not submit real patient or medical information.
+```
+CarePoint/
+├── run.bat                          # One-click compilation and execution script
+├── data/
+│   ├── appointments.xlsx            # Real-time Microsoft Excel spreadsheet of all appointments
+│   ├── appointments.csv             # CSV version of appointments
+│   ├── appointments.tsv             # Local appointment storage
+│   └── users.tsv                    # Registered user accounts storage
+├── src/
+│   └── main/
+│       ├── java/com/college/hospital/
+│       │   ├── HospitalAppointmentServer.java   # HTTP server & routing controller
+│       │   ├── Appointment.java                 # Appointment entity model
+│       │   ├── User.java                        # User account & authentication model
+│       │   └── ExcelManager.java                # Pure Java Excel (.xlsx) generator using OpenXML
+│       └── resources/static/
+│           ├── index.html                       # Login, Create Account & Dashboard UI
+│           ├── app.js                           # Frontend controller & API client
+│           └── styles.css                       # Responsive healthcare styling
+```
