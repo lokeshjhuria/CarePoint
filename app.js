@@ -68,6 +68,8 @@ const rows = document.querySelector("#appointment-rows");
 const emptyState = document.querySelector("#empty-state");
 const searchInput = document.querySelector("#search-input");
 const statusFilter = document.querySelector("#status-filter");
+const appointmentSort = document.querySelector("#appointment-sort");
+const appointmentAlert = document.querySelector("#appointment-alert");
 const formMessage = document.querySelector("#form-message");
 const refreshBtn = document.querySelector("#refresh-button");
 
@@ -387,6 +389,29 @@ async function refreshAppointments() {
   } catch (err) {
     console.error("Appointments fetch error:", err);
   }
+
+  function updateAppointmentAlert() {
+    const now = Date.now();
+    const upcoming = appointments
+      .filter(a => a.status === "Scheduled" && new Date(`${a.date}T${a.time}`).getTime() >= now)
+      .sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`))[0];
+
+    if (!upcoming) {
+      appointmentAlert.className = "appointment-alert";
+      appointmentAlert.textContent = "";
+      return;
+    }
+
+    const appointmentDate = new Date(`${upcoming.date}T${upcoming.time}`);
+    const formattedDate = appointmentDate.toLocaleDateString("en", {
+      weekday: "short", month: "short", day: "numeric"
+    });
+    const formattedTime = appointmentDate.toLocaleTimeString("en", {
+      hour: "numeric", minute: "2-digit"
+    });
+    appointmentAlert.className = "appointment-alert visible";
+    appointmentAlert.innerHTML = `<span class="appointment-alert-icon">🔔</span><span><strong>Upcoming appointment:</strong> ${escapeHtml(upcoming.doctor)} on ${formattedDate} at ${formattedTime}.</span>`;
+  }
 }
 
 function updateStats() {
@@ -406,12 +431,17 @@ function renderAppointmentsTable() {
   const isStaff = currentUser && (currentUser.role === "STAFF" || currentUser.role === "ADMIN");
   const query = searchInput.value.trim().toLowerCase();
   const status = statusFilter.value;
+  const sort = appointmentSort.value;
 
   const filtered = appointments.filter(a => {
     const textMatch = [a.patient, a.doctor, a.department, a.phone, a.email]
       .some(val => val && val.toLowerCase().includes(query));
     return textMatch && (status === "All" || a.status === status);
-  }).sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+  }).sort((a, b) => {
+    if (sort === "status") return a.status.localeCompare(b.status) || a.date.localeCompare(b.date);
+    const dateOrder = `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`);
+    return sort === "latest" ? -dateOrder : dateOrder;
+  });
 
   rows.innerHTML = filtered.map(item => {
     const statusClass = item.status.toLowerCase();
@@ -462,6 +492,7 @@ function renderAppointmentsTable() {
   emptyState.classList.toggle("visible", filtered.length === 0);
   document.querySelector("#results-count").textContent =
     `Showing ${filtered.length} appointment${filtered.length === 1 ? "" : "s"}`;
+  updateAppointmentAlert();
   updateStats();
 }
 
@@ -758,6 +789,7 @@ rows.addEventListener("click", async e => {
 // Search & Status filters in Dashboard
 searchInput.addEventListener("input", renderAppointmentsTable);
 statusFilter.addEventListener("change", renderAppointmentsTable);
+appointmentSort.addEventListener("change", renderAppointmentsTable);
 refreshBtn.addEventListener("click", refreshAppointments);
 
 // Date min attribute setup

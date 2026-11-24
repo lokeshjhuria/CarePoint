@@ -1656,3 +1656,34 @@ body.dark-mode .theme-toggle { color: #cbd5e1; border-color: #475569; }
   .theme-toggle-label { display: none; }
   .theme-toggle { padding: 8px; }
 }
+
+/* ================= APPOINTMENT PRODUCTIVITY FEATURES ================= */
+.appointment-alert {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-sm);
+  background: #eff6ff;
+  color: #1e40af;
+  font-size: 11px;
+}
+
+.appointment-alert.visible { display: flex; }
+.appointment-alert strong { font-weight: 700; }
+.appointment-alert-icon { font-size: 15px; }
+
+@media (max-width: 600px) {
+  .table-toolbar { flex-wrap: wrap; }
+  .search-input-wrap { flex-basis: 100%; }
+  .status-filter-wrap { flex: 1; }
+  .status-filter-wrap select { width: 100%; }
+}
+
+body.dark-mode .appointment-alert {
+  border-color: #1d4ed8;
+  background: #172554;
+  color: #bfdbfe;
+}

@@ -348,6 +348,7 @@
         
         <!-- LEFT COLUMN: APPOINTMENTS DIRECTORY TABLE -->
         <section class="dash-panel appointments-section" id="section-appointments-table">
+          <div class="appointment-alert" id="appointment-alert" role="status" aria-live="polite"></div>
           <div class="panel-top-row">
             <div>
               <h2 id="appointments-title">Appointments Directory</h2>
@@ -371,6 +372,14 @@
                 <option value="Scheduled">Scheduled</option>
                 <option value="Completed">Completed</option>
                 <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="status-filter-wrap">
+              <label for="appointment-sort" class="sr-only">Sort appointments</label>
+              <select id="appointment-sort">
+                <option value="soonest">Soonest first</option>
+                <option value="latest">Latest first</option>
+                <option value="status">Status</option>
               </select>
             </div>
           </div>
