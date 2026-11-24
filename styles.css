@@ -1529,3 +1529,130 @@ body {
   .dashboard-header-row { flex-direction: column; align-items: flex-start; }
   .footer-top { grid-template-columns: 1fr; }
 }
+
+/* ================= THEME TOGGLE ================= */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font: 600 11px "DM Sans", sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.theme-toggle:hover,
+.theme-toggle.is-dark {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: #93c5fd;
+}
+
+.theme-toggle-icon { font-size: 15px; line-height: 1; }
+
+/* Dark theme */
+body.dark-mode {
+  --line: #334155;
+  --text-muted: #94a3b8;
+  --text-dark: #e2e8f0;
+  --primary-light: #172554;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+body.dark-mode .navbar,
+body.dark-mode .hero-search-box,
+body.dark-mode .floating-badge,
+body.dark-mode .hospital-strip,
+body.dark-mode .doctor-card,
+body.dark-mode .feature-card,
+body.dark-mode .testimonial-card,
+body.dark-mode .dash-stat-card,
+body.dark-mode .dash-panel,
+body.dark-mode .modal-dialog {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+body.dark-mode .hero-section {
+  background: radial-gradient(circle at top right, #172554 0%, #0f172a 65%);
+}
+
+body.dark-mode .section-container.bg-subtle,
+body.dark-mode .dashboard-view {
+  background: #111c2f;
+}
+
+body.dark-mode .brand,
+body.dark-mode .hero-content h1,
+body.dark-mode .hero-stat-item strong,
+body.dark-mode .section-header h2,
+body.dark-mode .doc-name,
+body.dark-mode .floating-badge strong,
+body.dark-mode .strip-col strong,
+body.dark-mode .modal-header h2,
+body.dark-mode .selection-card strong,
+body.dark-mode .empty-state strong {
+  color: #f8fafc;
+}
+
+body.dark-mode .brand-light,
+body.dark-mode .nav-item,
+body.dark-mode .hero-description,
+body.dark-mode .section-header p,
+body.dark-mode .hero-stat-item small,
+body.dark-mode .strip-col small,
+body.dark-mode .feature-card p,
+body.dark-mode .testimonial-card p,
+body.dark-mode .dash-subtitle,
+body.dark-mode .panel-top-row p,
+body.dark-mode .modal-header p,
+body.dark-mode .selection-card small {
+  color: #94a3b8;
+}
+
+body.dark-mode .btn-text,
+body.dark-mode .btn-outline,
+body.dark-mode .btn-csv,
+body.dark-mode .btn-refresh,
+body.dark-mode .tag-chip,
+body.dark-mode .dept-chip,
+body.dark-mode .doc-dept-badge,
+body.dark-mode .user-pill {
+  background: #273449;
+  color: #cbd5e1;
+  border-color: #475569;
+}
+
+body.dark-mode .hero-search-box input,
+body.dark-mode .search-input-wrap input,
+body.dark-mode .status-filter-wrap select,
+body.dark-mode .appointment-form input,
+body.dark-mode .appointment-form select,
+body.dark-mode .appointment-form textarea,
+body.dark-mode .modal-form input,
+body.dark-mode .modal-form select {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+body.dark-mode .appointments-table th { background: #273449; color: #cbd5e1; }
+body.dark-mode .appointments-table td { border-color: #334155; }
+body.dark-mode .appointments-table tbody tr:hover { background: #243247; }
+body.dark-mode .selection-card { background: #1e293b; border-color: #475569; }
+body.dark-mode .selection-card.active { background: #172554; border-color: #60a5fa; }
+body.dark-mode .auth-tabs-row,
+body.dark-mode .demo-login-strip { background: #172235; }
+body.dark-mode .modal-close-btn:hover { background: #334155; color: #f8fafc; }
+body.dark-mode .theme-toggle { color: #cbd5e1; border-color: #475569; }
+
+@media (max-width: 768px) {
+  .theme-toggle-label { display: none; }
+  .theme-toggle { padding: 8px; }
+}

@@ -45,6 +45,7 @@ const navAvatar = document.querySelector("#nav-avatar");
 const navUserName = document.querySelector("#nav-user-name");
 const navUserRole = document.querySelector("#nav-user-role");
 const navLogoutBtn = document.querySelector("#nav-logout-btn");
+const themeToggle = document.querySelector("#theme-toggle");
 
 const openLoginBtn = document.querySelector("#open-login-btn");
 const openRegisterBtn = document.querySelector("#open-register-btn");
@@ -69,6 +70,25 @@ const searchInput = document.querySelector("#search-input");
 const statusFilter = document.querySelector("#status-filter");
 const formMessage = document.querySelector("#form-message");
 const refreshBtn = document.querySelector("#refresh-button");
+
+function updateThemeToggle() {
+  const isDark = document.body.classList.contains("dark-mode");
+  const label = isDark ? "Light mode" : "Dark mode";
+  themeToggle.classList.toggle("is-dark", isDark);
+  themeToggle.querySelector(".theme-toggle-icon").textContent = isDark ? "☀" : "☾";
+  themeToggle.querySelector(".theme-toggle-label").textContent = label;
+  themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+  themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
+}
+
+function initializeTheme() {
+  const savedTheme = localStorage.getItem("carepoint_theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+    document.body.classList.add("dark-mode");
+  }
+  updateThemeToggle();
+}
 
 // Helpers
 function escapeHtml(val) {
@@ -465,6 +485,12 @@ btnNavDashboard.addEventListener("click", e => { e.preventDefault(); showView("d
 btnBackToHome.addEventListener("click", () => showView("home"));
 
 // Auth Modal Open/Close
+themeToggle.addEventListener("click", () => {
+  const isDark = document.body.classList.toggle("dark-mode");
+  localStorage.setItem("carepoint_theme", isDark ? "dark" : "light");
+  updateThemeToggle();
+});
+
 openLoginBtn.addEventListener("click", () => openAuthModal("login"));
 openRegisterBtn.addEventListener("click", () => openAuthModal("register"));
 document.querySelector("#btn-hero-book")?.addEventListener("click", () => {
@@ -741,4 +767,5 @@ const datePicker = document.querySelector("#date-input");
 if (datePicker) datePicker.min = todayStr;
 
 // Initialize Application
+initializeTheme();
 Promise.all([checkAuth(), loadDoctorsData()]).catch(console.error);
