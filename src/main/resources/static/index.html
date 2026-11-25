@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#1a365d">
   <title>CarePoint Health | Hospital Appointment Management System</title>
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem("carepoint_theme");
+        var theme = savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.dataset.theme = theme;
+      } catch (e) {
+        document.documentElement.dataset.theme = "light";
+      }
+    }());
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -44,6 +55,11 @@
       </nav>
 
       <div class="navbar-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" title="Switch to dark mode">
+          <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
+          <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
+        </button>
+
         <!-- Live Excel Download Pill -->
         <a href="/api/appointments/export-excel" id="nav-excel-download" class="excel-pill-btn" download="carepoint_appointments.xlsx" title="Download Live Excel Spreadsheet">
           <span class="excel-icon">📊</span>
