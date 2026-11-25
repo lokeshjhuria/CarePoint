@@ -1662,6 +1662,217 @@ html { scroll-behavior: smooth; }
   animation: fade-up 0.45s ease both;
 }
 
+/* Theme toggle */
+.theme-toggle {
+  position: relative;
+  width: 38px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+.theme-icon {
+  position: absolute;
+  font-size: 16px;
+  line-height: 1;
+  transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.theme-icon-moon { opacity: 0; transform: rotate(-35deg) scale(0.7); }
+.theme-icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+
+/* Dark theme */
+:root[data-theme="dark"] {
+  --primary-light: #172a4d;
+  --navy: #e5edf7;
+  --navy-light: #cbd5e1;
+  --line: #26344a;
+  --text-muted: #9fb0c6;
+  --text-dark: #e8eff8;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.32);
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] .dashboard-view {
+  background: #0b1220;
+  color: #e8eff8;
+}
+
+:root[data-theme="dark"] .navbar,
+:root[data-theme="dark"] .modal-dialog,
+:root[data-theme="dark"] .doctor-card,
+:root[data-theme="dark"] .feature-card,
+:root[data-theme="dark"] .testimonial-card,
+:root[data-theme="dark"] .dash-panel,
+:root[data-theme="dark"] .dash-stat-card,
+:root[data-theme="dark"] .floating-badge,
+:root[data-theme="dark"] .hero-search-box,
+:root[data-theme="dark"] .tag-chip,
+:root[data-theme="dark"] .btn-outline,
+:root[data-theme="dark"] .btn-csv,
+:root[data-theme="dark"] .btn-refresh,
+:root[data-theme="dark"] .search-input-wrap,
+:root[data-theme="dark"] .demo-chip-btn,
+:root[data-theme="dark"] .selection-card,
+:root[data-theme="dark"] .theme-toggle {
+  background: #111a2a;
+  border-color: #26344a;
+  color: #e8eff8;
+}
+
+:root[data-theme="dark"] .theme-icon-sun { opacity: 0; transform: rotate(35deg) scale(0.7); }
+:root[data-theme="dark"] .theme-icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+:root[data-theme="dark"] .theme-toggle:hover { background: #17243a; border-color: #3b82f6; }
+
+:root[data-theme="dark"] .hero-section {
+  background: radial-gradient(circle at top right, #17233a 0%, #0b1220 68%);
+}
+
+:root[data-theme="dark"] .hospital-strip,
+:root[data-theme="dark"] .section-container.bg-subtle,
+:root[data-theme="dark"] .appointments-table thead,
+:root[data-theme="dark"] .auth-tabs-row,
+:root[data-theme="dark"] .role-pill-switch,
+:root[data-theme="dark"] .empty-icon,
+:root[data-theme="dark"] .modal-close-btn,
+:root[data-theme="dark"] .user-pill,
+:root[data-theme="dark"] .dept-chip {
+  background: #111a2a;
+  border-color: #26344a;
+}
+
+:root[data-theme="dark"] .hero-content h1,
+:root[data-theme="dark"] .hero-stat-item strong,
+:root[data-theme="dark"] .strip-col strong,
+:root[data-theme="dark"] .strip-num,
+:root[data-theme="dark"] .section-header h2,
+:root[data-theme="dark"] .doc-name,
+:root[data-theme="dark"] .feature-card h3,
+:root[data-theme="dark"] .testimonial-card p,
+:root[data-theme="dark"] .testi-author strong,
+:root[data-theme="dark"] .floating-badge strong,
+:root[data-theme="dark"] .dashboard-header-row h1,
+:root[data-theme="dark"] .panel-top-row h2,
+:root[data-theme="dark"] .dash-stat-card > strong,
+:root[data-theme="dark"] .patient-cell strong,
+:root[data-theme="dark"] .doc-cell strong,
+:root[data-theme="dark"] .empty-state strong,
+:root[data-theme="dark"] .modal-header h2,
+:root[data-theme="dark"] .tab-btn.active,
+:root[data-theme="dark"] .selection-card strong {
+  color: #e8eff8;
+}
+
+:root[data-theme="dark"] .hero-description,
+:root[data-theme="dark"] .hero-stat-item small,
+:root[data-theme="dark"] .strip-col small,
+:root[data-theme="dark"] .section-header p,
+:root[data-theme="dark"] .feature-card p,
+:root[data-theme="dark"] .testi-author small,
+:root[data-theme="dark"] .floating-badge small,
+:root[data-theme="dark"] .portal-subtext,
+:root[data-theme="dark"] .dash-subtitle,
+:root[data-theme="dark"] .panel-top-row p,
+:root[data-theme="dark"] .appointments-table th,
+:root[data-theme="dark"] .appointments-table td,
+:root[data-theme="dark"] .patient-cell small,
+:root[data-theme="dark"] .doc-cell small,
+:root[data-theme="dark"] .time-cell small,
+:root[data-theme="dark"] .empty-state p,
+:root[data-theme="dark"] .modal-header p,
+:root[data-theme="dark"] .selection-card small,
+:root[data-theme="dark"] .selection-title,
+:root[data-theme="dark"] .form-secure-note,
+:root[data-theme="dark"] .table-bottom-bar {
+  color: #9fb0c6;
+}
+
+:root[data-theme="dark"] .nav-item,
+:root[data-theme="dark"] .btn-text,
+:root[data-theme="dark"] .btn-outline,
+:root[data-theme="dark"] .btn-csv,
+:root[data-theme="dark"] .btn-refresh,
+:root[data-theme="dark"] .tab-btn,
+:root[data-theme="dark"] .appointment-form label,
+:root[data-theme="dark"] .modal-form label {
+  color: #b5c3d6;
+}
+
+:root[data-theme="dark"] .nav-item:hover,
+:root[data-theme="dark"] .nav-item.active,
+:root[data-theme="dark"] .tag-chip:hover,
+:root[data-theme="dark"] .dept-chip:hover,
+:root[data-theme="dark"] .dept-chip.active,
+:root[data-theme="dark"] .testimonial-card.highlight,
+:root[data-theme="dark"] .selection-card.active,
+:root[data-theme="dark"] .appointment-alert,
+:root[data-theme="dark"] .hero-badge,
+:root[data-theme="dark"] .demo-login-strip {
+  background: #17243a;
+  border-color: #31517a;
+  color: #b9d3ff;
+}
+
+:root[data-theme="dark"] .brand,
+:root[data-theme="dark"] .brand-light,
+:root[data-theme="dark"] .brand small,
+:root[data-theme="dark"] .user-pill-info strong,
+:root[data-theme="dark"] .search-input-wrap input,
+:root[data-theme="dark"] .status-filter-wrap select,
+:root[data-theme="dark"] .action-select,
+:root[data-theme="dark"] .appointment-form input,
+:root[data-theme="dark"] .appointment-form select,
+:root[data-theme="dark"] .appointment-form textarea,
+:root[data-theme="dark"] .modal-form input,
+:root[data-theme="dark"] .modal-form select,
+:root[data-theme="dark"] .hero-search-box input,
+:root[data-theme="dark"] .demo-chip-btn {
+  color: #e8eff8;
+}
+
+:root[data-theme="dark"] .appointment-form input,
+:root[data-theme="dark"] .appointment-form select,
+:root[data-theme="dark"] .appointment-form textarea,
+:root[data-theme="dark"] .modal-form input,
+:root[data-theme="dark"] .modal-form select,
+:root[data-theme="dark"] .status-filter-wrap select,
+:root[data-theme="dark"] .action-select,
+:root[data-theme="dark"] .hero-search-box input {
+  background: #0f1728;
+  border-color: #26344a;
+}
+
+:root[data-theme="dark"] .appointments-table td,
+:root[data-theme="dark"] .table-bottom-bar,
+:root[data-theme="dark"] .doc-meta {
+  border-color: #26344a;
+}
+
+:root[data-theme="dark"] .excel-live-banner {
+  background: #10251b;
+  border-color: #225a3a;
+}
+
+:root[data-theme="dark"] .modal-backdrop { background: rgba(2, 6, 23, 0.78); }
+:root[data-theme="dark"] .brand-mark { background: #17243a; }
+:root[data-theme="dark"] .modal-close-btn:hover { background: #26344a; color: #e8eff8; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
