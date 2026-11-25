@@ -110,6 +110,9 @@ function showView(viewName) {
     }
     viewHome.style.display = "none";
     viewDashboard.style.display = "block";
+    viewDashboard.classList.remove("view-enter");
+    void viewDashboard.offsetWidth;
+    viewDashboard.classList.add("view-enter");
     btnNavDashboard.classList.add("active");
     btnNavHome.classList.remove("active");
     btnNavDoctors.classList.remove("active");
@@ -118,6 +121,9 @@ function showView(viewName) {
   } else {
     viewDashboard.style.display = "none";
     viewHome.style.display = "block";
+    viewHome.classList.remove("view-enter");
+    void viewHome.offsetWidth;
+    viewHome.classList.add("view-enter");
     btnNavHome.classList.add("active");
     btnNavDashboard.classList.remove("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -323,13 +329,13 @@ function renderDoctorCards(filterDept = "All", searchQuery = "") {
     return;
   }
 
-  container.innerHTML = filtered.map(name => {
+  container.innerHTML = filtered.map((name, index) => {
     const dept = doctorDepartments[name] || "General";
     const imgId = DOCTOR_IMAGES[name] || "photo-1559839734-2b71ea197ec2";
     const imgUrl = `https://images.unsplash.com/${imgId}?auto=format&fit=crop&w=150&h=150&q=80`;
 
     return `
-      <article class="doctor-card">
+      <article class="doctor-card card-enter" style="animation-delay:${Math.min(index * 55, 330)}ms">
         <div class="doc-top">
           <img class="doc-img" src="${imgUrl}" alt="${escapeHtml(name)}">
           <div>
@@ -774,3 +780,30 @@ if (datePicker) datePicker.min = todayStr;
 
 // Initialize Application
 Promise.all([checkAuth(), loadDoctorsData()]).catch(console.error);
+
+// Reveal sections and cards as they enter the viewport.
+function setupScrollReveal() {
+  const targets = document.querySelectorAll(
+    ".section-header, .hospital-strip, .features-grid, .testimonials-grid, .strip-container"
+  );
+
+  targets.forEach(target => target.classList.add("reveal"));
+
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach(target => target.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -40px" });
+
+  targets.forEach(target => observer.observe(target));
+}
+
+setupScrollReveal();

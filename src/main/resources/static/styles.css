@@ -35,6 +35,38 @@ body {
   line-height: 1.5;
 }
 
+html { scroll-behavior: smooth; }
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes soft-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes view-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-pop {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* ================= EMERGENCY BAR ================= */
 .emergency-bar {
   background: #0f172a;
@@ -221,6 +253,28 @@ body {
 
 .btn-primary:hover {
   background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.28);
+}
+
+.btn-primary,
+.btn-text,
+.excel-pill-btn,
+.hero-search-btn,
+.tag-chip,
+.dept-chip,
+.doc-book-btn {
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn-primary:active,
+.btn-text:active,
+.excel-pill-btn:active,
+.hero-search-btn:active,
+.tag-chip:active,
+.dept-chip:active,
+.doc-book-btn:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .btn-text {
@@ -300,6 +354,19 @@ body {
   padding: 56px 24px 64px;
   background: radial-gradient(circle at top right, #e0e7ff 0%, #f8fafc 65%);
 }
+
+.hero-badge { animation: fade-up 0.55s 0.05s both; }
+.hero-content h1 { animation: fade-up 0.65s 0.12s both; }
+.hero-description { animation: fade-up 0.65s 0.2s both; }
+.hero-search-box { animation: fade-up 0.65s 0.28s both; transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
+.hero-search-box:focus-within {
+  border-color: #93c5fd;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.12);
+  transform: translateY(-1px);
+}
+.popular-tags { animation: fade-up 0.65s 0.36s both; }
+.hero-stats { animation: fade-up 0.65s 0.44s both; }
+.hero-visual { animation: fade-right 0.75s 0.18s both; }
 
 .hero-container {
   max-width: 1440px;
@@ -446,6 +513,9 @@ body {
   border-radius: 18px;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
 }
+
+.floating-badge { animation: soft-float 4s ease-in-out infinite; }
+.floating-badge.badge-bottom { animation-delay: -2s; }
 
 .floating-badge {
   position: absolute;
@@ -614,9 +684,12 @@ body {
 }
 
 .doctor-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
 }
+
+.doc-img { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.doctor-card:hover .doc-img { transform: scale(1.05); box-shadow: 0 5px 14px rgba(37, 99, 235, 0.18); }
 
 .doc-top {
   display: flex;
@@ -682,7 +755,17 @@ body {
   border-radius: var(--radius-md);
   padding: 24px 20px;
   box-shadow: var(--shadow-sm);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  border-color: #bfdbfe;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
+}
+
+.feature-icon { transition: transform 0.22s ease; }
+.feature-card:hover .feature-icon { transform: rotate(-4deg) scale(1.08); }
 
 .feature-icon {
   width: 42px;
@@ -714,7 +797,10 @@ body {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 22px;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
+
+.testimonial-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 
 .testimonial-card.highlight {
   background: #eff6ff;
@@ -1292,6 +1378,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
+  animation: modal-fade 0.2s ease both;
 }
 
 .modal-dialog {
@@ -1302,6 +1389,7 @@ body {
   padding: 30px;
   position: relative;
   box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+  animation: modal-pop 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .modal-close-btn {
@@ -1553,4 +1641,36 @@ body {
   .search-input-wrap { flex-basis: 100%; }
   .status-filter-wrap { flex: 1; }
   .status-filter-wrap select { width: 100%; }
+}
+
+/* Scroll and view transitions */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.view-enter { animation: view-enter 0.35s ease both; }
+
+.doctor-card.card-enter {
+  opacity: 0;
+  animation: fade-up 0.45s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
