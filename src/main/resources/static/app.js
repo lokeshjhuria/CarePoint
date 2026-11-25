@@ -32,7 +32,6 @@ const DOCTOR_IMAGES = {
 const viewHome = document.querySelector("#view-home");
 const viewDashboard = document.querySelector("#view-dashboard");
 const authModal = document.querySelector("#auth-modal");
-const themeToggle = document.querySelector("#theme-toggle");
 
 const btnNavHome = document.querySelector("#btn-nav-home");
 const btnNavDoctors = document.querySelector("#btn-nav-doctors");
@@ -486,21 +485,6 @@ function renderAppointmentsTable() {
 // -----------------------------------------------------------------------------
 // EVENT LISTENERS
 // -----------------------------------------------------------------------------
-
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  const isDark = theme === "dark";
-  localStorage.setItem("carepoint_theme", theme);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", isDark ? "#0b1220" : "#1a365d");
-  themeToggle?.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
-  themeToggle?.setAttribute("title", isDark ? "Switch to light mode" : "Switch to dark mode");
-  themeToggle?.setAttribute("aria-pressed", String(isDark));
-}
-
-applyTheme(document.documentElement.dataset.theme || "light");
-themeToggle?.addEventListener("click", () => {
-  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
-});
 
 // Nav Links
 btnNavHome.addEventListener("click", e => { e.preventDefault(); showView("home"); });
